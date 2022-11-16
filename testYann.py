@@ -3,14 +3,19 @@
 #
 # Imports
 #
+import dis
+from faulthandler import disable
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Output,Input
+import dash_bootstrap_components as dbc
+from dash.dependencies import Output,Input,State
 
 import csv
+from matplotlib.widgets import Slider
 import plotly.express as px
 import pandas as pd
+from sqlalchemy import false
 
 
 def read_file(filename):
@@ -45,15 +50,15 @@ data = { year:gapminder.query("year == @year") for year in years} # (2)
 
 if __name__ == '__main__':
     app = dash.Dash(__name__) # (3)
-
+    disableInter = False
     fig = px.scatter(data[year], x="gdpPercap", y="lifeExp",
                         color="continent",
                         size="pop",
                         hover_name="country") # (4)
 
-    # l = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
+    l = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
 
-    # fig = px.histogram(data_frame=l, x="Capacité de l’établissement par formation")
+    fig2 = px.histogram(data_frame=l, x="Capacité de l’établissement par formation")
 
     app.layout = html.Div(children=[
 
@@ -85,7 +90,18 @@ if __name__ == '__main__':
                                 id='graph1',
                                 figure=fig
                             ), # (6)
-
+                            
+                            html.Div(
+                                id = "graph2-container",
+                                children = [
+                                    dcc.Graph(
+                                        id = "graph2",
+                                        figure = fig2
+                                    ),
+                                ],
+                                style = {"display" : "none"}
+                            ),
+                                
                             html.Div(children=f'''
                                 자유로운 기분, I like that
                                 고민 따윈 already done, done (done, done)
@@ -99,12 +115,27 @@ if __name__ == '__main__':
                             
                             dcc.Interval(   id='interval',
                                 interval=1*1000, # in milliseconds
-                                n_intervals=0),
+                                n_intervals=0,
+                                ),
                             
-                            html.Button(
-                                id = "Play"
+                            dbc.Button(
+                                "Play",
+                                color = "Play",
+                                id = "Play",
+                                title= "Play",
+                                n_clicks=0
                             ),
-
+                            html.Span(id="PlayClick",style={"verticalAlign" : "middle"}),
+                            
+                            dcc.Dropdown(
+                                id = "Change",
+                                options = [
+                                    {'label' : 'Yes','value':True},
+                                    {'label' : 'No' ,'value':False}
+                                ],
+                                value=True
+                            ),
+                            html.Span(id="ChangeClick",style={"verticalAlign" : "middle"}),
     ]
     )
 
@@ -124,6 +155,44 @@ if __name__ == '__main__':
     def on_tick(n_intervals):
         if n_intervals is None: return 0
         return years[(n_intervals+1)%len(years)]
+    
+    @app.callback(
+    Output("PlayClick", "children"), [Input("Play", "n_clicks")]
+)
+    def on_button_click(n):
+        if n is None:
+            return "Not clicked."
+        else:
+            return f"Clicked {n} times."
+    
+    @app.callback(
+    Output("interval", "disabled"), [Input("Play", "n_clicks")], State("interval","disabled"),
+)
+    def toogle(n,playing):
+        if n:
+            return not playing
+        else:
+            return playing
+    
+    
+    @app.callback(
+    Output("ChangeClick", "children"), [Input("Change", "n_clicks")]
+    )
+    def on_button_click(n):
+        if n is None:
+            return "Not clicked."
+        else:
+            return f"Clicked {n} times."
+    
+    @app.callback(
+    Output("graph2-container", "style"), [Input("Change", "value")],
+)
+    def hide(n):
+        if not n:
+            return {'display': 'none'}
+        else:
+            return {'display': 'block'}
+    
     
     
     
