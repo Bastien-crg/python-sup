@@ -3,7 +3,7 @@ import pandas as pd
 import math
 
 def functionTransform(data):
-    return math.log(data)
+    return ((math.log(data))**2)/5
 
 def mapFromationColor(name):
     match name:         
@@ -52,7 +52,7 @@ def mapParFilièreTresAgrégée(dataframe,name):
     for i in lstName.index:
         folium.CircleMarker(
             location = (float((lstName["Coordonnées GPS de la formation"][i].split(","))[0]), float((lstName["Coordonnées GPS de la formation"][i].split(","))[1])),
-            radius = functionTransform( lstName["Capacité de l’établissement par formation"][i] ),
+            radius = functionTransform(lstName["Capacité de l’établissement par formation"][i] ),
             color = mapFromationColor(dataframe["Filière de formation très agrégée"][i]),
             fill = True,
             fill_color = mapFromationColor(dataframe["Filière de formation très agrégée"][i])
@@ -65,7 +65,7 @@ def main():
     for i in range(len(coordTemp)):
         if(type(coordTemp[i]) != str):
             c = c.drop(labels=i,axis=0)
-    mapParFilièreTresAgrégée(c,"BTS")
+    mapParFilièreTresAgrégée(c,"CPGE")
     mapTouteFormation(c)
     
     
