@@ -25,8 +25,6 @@ def mapFromationColor(name):
             return 'orange'
         case "PASS":
             return 'black'
-        case "License_Las":
-            return 'white'
         case _:
             return 'crimson'
 
@@ -42,8 +40,7 @@ def mapTouteFormation(dataframe):
             fill = True,
             fill_color = mapFromationColor(dataframe["Filière de formation très agrégée"][i])
         ).add_to(map)
-    
-    map.save(outfile='Toute les Formation.html')    
+    return map   
 
 def mapParFilièreTresAgrégée(dataframe,name):
     coordsFrance = (46.539758, 2.430331)
@@ -56,8 +53,16 @@ def mapParFilièreTresAgrégée(dataframe,name):
             color = mapFromationColor(dataframe["Filière de formation très agrégée"][i]),
             fill = True,
             fill_color = mapFromationColor(dataframe["Filière de formation très agrégée"][i])
-        ).add_to(map2)      
-    map2.save(outfile='map2.html')
+        ).add_to(map2)  
+    return map2
+
+def createAllMap(dataframe):
+    lstNameFormation = ["BTS","Ecole d'Ingénieur","Licence","Ecole de Commerce","CPGE","BUT","IFSI","EFTS","PASS",]
+    for name in lstNameFormation :
+        map = mapParFilièreTresAgrégée(dataframe,name)
+        map.save("src\Carte_par_formation_{}.html".format(name))
+    map = mapTouteFormation(dataframe)
+    map.save("src\Carte_toute_formation.html")
 
 def main():
     c = pd.read_csv("fr-esr-parcoursup.csv", sep = ";")
@@ -65,8 +70,7 @@ def main():
     for i in range(len(coordTemp)):
         if(type(coordTemp[i]) != str):
             c = c.drop(labels=i,axis=0)
-    mapParFilièreTresAgrégée(c,"CPGE")
-    mapTouteFormation(c)
+    createAllMap(c)
     
     
 if __name__ == '__main__':
