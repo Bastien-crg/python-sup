@@ -1,6 +1,6 @@
 import plotly.express as px
 
-from chart.basic_chart import BasicChart
+from src.chart.basic_chart import BasicChart
 
 
 class Histogram(BasicChart):
@@ -15,6 +15,6 @@ class Histogram(BasicChart):
     def render_chart(self):
         self.data = self.data.loc[self.data[self.x] <= self.max_value]
         fig = px.histogram(data_frame=self.data, x=self.x, nbins=self.nbins)
-        fig.show()
+        return fig
 
 

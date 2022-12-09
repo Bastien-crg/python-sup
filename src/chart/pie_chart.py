@@ -1,6 +1,5 @@
 import plotly.express as px
-
-from chart.basic_chart import BasicChart
+from src.chart.basic_chart import BasicChart
 
 
 class PieChart(BasicChart):
@@ -12,9 +11,5 @@ class PieChart(BasicChart):
         self.set_data(data)
 
     def render_chart(self):
-        fig = px.pie(self.data, values=self.values, names=self.names)
-        fig.show()
-        
-    def returnPx(self):
         fig = px.pie(self.data, values=self.values, names=self.names)
         return fig
