@@ -14,7 +14,7 @@ class RankChart(BasicChart):
     # x : Capacité de l’établissement par formation, nbins : 20
     def render_chart(self, **parameters):
         fig = go.Figure(go.Bar(x=self.cities["nb_of_form"], y=self.cities[0], orientation='h'))
-        fig.show()
+        return fig
 
     def manage_data(self, **parameters):
         self.data = self.backup_data["Commune de l’établissement"].unique()

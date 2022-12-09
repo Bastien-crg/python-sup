@@ -25,4 +25,4 @@ class BarChart(BasicChart):
             go.Bar(name='Fille', x=self.formations, y=self.fille)
         ])
         fig.update_layout(barmode='group')
-        fig.show()
+        return fig
