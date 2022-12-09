@@ -60,9 +60,9 @@ def createAllMap(dataframe):
     lstNameFormation = ["BTS","Ecole d'Ingénieur","Licence","Ecole de Commerce","CPGE","BUT","IFSI","EFTS","PASS",]
     for name in lstNameFormation :
         map = mapParFilièreTresAgrégée(dataframe,name)
-        map.save("src\Carte_par_formation_{}.html".format(name))
+        map.save("../templates/Carte_par_formation_{}.html".format(name))
     map = mapTouteFormation(dataframe)
-    map.save("src\Carte_toute_formation.html")
+    map.save("../templates/Carte_toute_formation.html")
 
 def main():
     c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep =";")

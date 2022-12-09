@@ -6,14 +6,15 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Output,Input
 
 import csv
 import plotly.express as px
 import pandas as pd
 
-from file_manager import FileManager
-from src.chart.pie_chart import PieChart
+import DebutCarte
 
+from file_manager import FileManager
 
 def read_file(filename):
     l = []
@@ -58,7 +59,7 @@ if __name__ == '__main__':
     
     app = dash.Dash(__name__) # (3)
     disableInter = False
-    c = pd.read_csv("fr-esr-parcoursup.csv", sep = ";")
+    c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep = ";")
     coordTemp = c["Coordonnées GPS de la formation"]
     for i in range(len(coordTemp)):
         if(type(coordTemp[i]) != str):
@@ -68,7 +69,7 @@ if __name__ == '__main__':
     app.layout = html.Div(children=[
 
                             html.H1(children=f'Titre de la page',
-                                        style={'textAlign': 'center', 'color': '#7FDBFF'}),
+                                    style={'Position' : 'relative','width' : '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
                             
                             html.Div(
                                 id = "Map_Par_Formation",
@@ -92,21 +93,26 @@ if __name__ == '__main__':
                                         {'label' : "License_Las",'value':"License_Las"}
                                     ],
                                     value='All'
+                                    #style = { 'position' : 'relative','width' : '78%','padding' : 10 , 'float':'right'}
                                 ), 
                             
                                 html.Iframe(
                                     id = 'mapParFormation',
-                                    srcDoc = open("templates\Carte_toute_formation.html",'r').read(),
-                                    width = '60%',
-                                    height = '600',
-                                    margin = {
-                                        'l': 90, 'b': 20, 't': 0, 'r': 0
-                                    }
+                                    srcDoc = open("../templates/Carte_toute_formation.html",'r').read(),
+                                    height = '550',
+                                    width = '60%'
+                                    #style = { 'position' : 'relative','width' : '60%','padding' : 10 , 'float':'right'}
                                 ),
                                 
                             ]), 
                             
-                            html.Div(children=f'''
+                            html.Button('hideTest', id='hideTest', n_clicks=0),
+                            
+                            html.Div(
+                                id = 'Div_test',
+                                hidden = False,
+                                
+                                children=f'''
                                 자유로운 기분, I like that
                                 고민 따윈 already done, done (done, done)
                                 색안경 끼고 보는 게 죄지
@@ -122,47 +128,23 @@ if __name__ == '__main__':
                             html.Span(id="ChangeClick",style={"verticalAlign" : "middle"}),
     ]
     )
-
-    # # Permet de changer la date; possible de faire la meme mais pour les cartes avec les départements
-    # @app.callback(
-    #     Output(component_id='graph1', component_property='figure'), # (1)
-    #     [Input(component_id='year-slider', component_property='value')] # (2)
-    # )
-    # def update_figure(input_value): # (3)
-    #     return px.scatter(data[input_value], x="gdpPercap", y="lifeExp",
-    #                     color="continent",
-    #                     size="pop",
-    #                     hover_name="country") # (4)
-    
-#     @app.callback(
-#     Output("interval", "disabled"), [Input("Play", "n_clicks")], State("interval","disabled"),
-# )
-#     def toogle(n,playing):
-#         if n:
-#             return not playing
-#         else:
-#             return playing
-    
-    
-    # @app.callback(
-    # Output("ChangeClick", "children"), [Input("Change", "n_clicks")]
-    # )
-    # def on_button_click(n):
-    #     if n is None:
-    #         return "Not clicked."
-    #     else:
-    #         return f"Clicked {n} times."
     
     @app.callback(
     Output("mapParFormation", "srcDoc"), [Input("Change", "value")],
 )
     def chooseFormation(name):
         if name == "All":
-            return open("src\Carte_toute_formation.html",'r').read()
-        return open("src\Carte_par_formation_{}.html".format(name),'r').read()
+            return open("../templates/Carte_toute_formation.html",'r').read()
+        return open("../templates/Carte_par_formation_{}.html".format(name),'r').read()
     
     
-    
+    @app.callback(
+    Output("Div_test", "hidden"), [Input("hideTest", "n_clicks")],
+)
+    def chooseFormation(n_clicks):
+        if n_clicks%2 == 0:
+            return True
+        return False
     
     
     #
