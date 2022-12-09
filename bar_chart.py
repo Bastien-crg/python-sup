@@ -22,6 +22,7 @@ def main():
     fig.update_layout(barmode='group')
     fig.show()
 
+
     # detailed
     formations = full_df["Filière de formation"].unique()
     fille = list()
