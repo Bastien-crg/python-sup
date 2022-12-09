@@ -17,6 +17,11 @@ import plotly.express as px
 import pandas as pd
 from sqlalchemy import false
 
+from file_manager import FileManager
+from chart.histogram import Histogram
+from chart.bar_chart import BarChart
+from chart.pie_chart import PieChart
+
 import DebutCarte 
 
 def read_file(filename):
@@ -50,6 +55,26 @@ data = { year:gapminder.query("year == @year") for year in years} # (2)
 #
 
 if __name__ == '__main__':
+    
+    df = pd.DataFrame({
+    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
+    "Amount": [4, 1, 2, 2, 4, 5],
+    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
+    })
+
+    fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+    
+    print(type(fig))
+    
+    file_manager = FileManager("fr-esr-parcoursup.csv")
+    file_list = file_manager.open_file()
+
+    data = file_list[0]
+    pie_chart = PieChart(data, values="Effectif total des candidats en phase principale",
+                         names='Filière de formation très agrégée')
+    
+    print(type(pie_chart))
+    
     app = dash.Dash(__name__) # (3)
     disableInter = False
     c = pd.read_csv("fr-esr-parcoursup.csv", sep = ";")
@@ -88,6 +113,13 @@ if __name__ == '__main__':
                                 width = '60%',
                                 height = '600'
                             ),
+                            html.Div(children='''
+                                Dash: A web application framework for your data.
+                            '''),
+                            dcc.Graph(
+                                id='example-graph',
+                                figure=fig
+                            ),    
                                 
                             html.Div(children=f'''
                                 자유로운 기분, I like that
@@ -99,6 +131,8 @@ if __name__ == '__main__':
                                 필요 없어 order
                                 Don't need no guidance, I'm makin' my way
                             '''), # (7)
+                            
+                            
                             
                             html.Span(id="ChangeClick",style={"verticalAlign" : "middle"}),
     ]
