@@ -3,24 +3,17 @@
 #
 # Imports
 #
-import dis
-from faulthandler import disable
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_bootstrap_components as dbc
-from dash.dependencies import Output,Input,State
+from dash.dependencies import Output,Input
 
 import csv
-from matplotlib.widgets import Slider
 import plotly.express as px
 import pandas as pd
-from sqlalchemy import false
 
 from file_manager import FileManager
-from chart.histogram import Histogram
-from chart.bar_chart import BarChart
-from chart.pie_chart import PieChart
+from src.chart.pie_chart import PieChart
 
 import DebutCarte 
 
@@ -34,7 +27,7 @@ def read_file(filename):
 
 
 def test():
-    l = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
+    l = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
 
     fig = px.histogram(data_frame=l, x="Capacité de l’établissement par formation")
     # fig = px.histogram(data_frame=sorted(l, key=lambda d: int(d['Capacité de l’établissement par formation'])), x="Capacité de l’établissement par formation", nbins=10)
@@ -77,7 +70,7 @@ if __name__ == '__main__':
     
     app = dash.Dash(__name__) # (3)
     disableInter = False
-    c = pd.read_csv("fr-esr-parcoursup.csv", sep = ";")
+    c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep =";")
     coordTemp = c["Coordonnées GPS de la formation"]
     for i in range(len(coordTemp)):
         if(type(coordTemp[i]) != str):

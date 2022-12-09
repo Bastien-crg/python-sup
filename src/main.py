@@ -1,13 +1,9 @@
 from file_manager import FileManager
-from chart.histogram import Histogram
-from chart.bar_chart import BarChart
-from chart.pie_chart import PieChart
-from dash import dcc
-from chart.rank_chart import RankChart
+from chart import RankChart
 
 
 def main():
-    file_manager = FileManager("fr-esr-parcoursup.csv")
+    file_manager = FileManager("../data/fr-esr-parcoursup.csv")
     file_list = file_manager.open_file()
 
     data = file_list[0]

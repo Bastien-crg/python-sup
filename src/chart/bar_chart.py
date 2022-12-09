@@ -1,6 +1,5 @@
-import plotly.express as px
 import plotly.graph_objects as go
-from chart.basic_chart import BasicChart
+from src.chart.basic_chart import BasicChart
 
 
 class BarChart(BasicChart):

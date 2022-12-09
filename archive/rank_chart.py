@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def main():
-    full_df = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
+    full_df = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
     full_df["counting"] = 1
     cities = full_df["Commune de l’établissement"].unique()
     cities = pd.DataFrame(cities)

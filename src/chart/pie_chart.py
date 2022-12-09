@@ -1,5 +1,5 @@
 import plotly.express as px
-from chart.basic_chart import BasicChart
+from src.chart.basic_chart import BasicChart
 
 
 class PieChart(BasicChart):

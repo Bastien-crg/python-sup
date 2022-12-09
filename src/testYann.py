@@ -28,7 +28,7 @@ def read_file(filename):
 
 
 def test():
-    l = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
+    l = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
 
     fig = px.histogram(data_frame=l, x="Capacité de l’établissement par formation")
     # fig = px.histogram(data_frame=sorted(l, key=lambda d: int(d['Capacité de l’établissement par formation'])), x="Capacité de l’établissement par formation", nbins=10)
@@ -57,7 +57,7 @@ if __name__ == '__main__':
                      size="pop",
                      hover_name="country")  # (4)
 
-    l = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
+    l = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
 
     fig2 = px.histogram(data_frame=l, x="Capacité de l’établissement par formation")
 

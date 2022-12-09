@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def main():
-    full_df = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
+    full_df = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
     fig = px.pie(full_df, values="Effectif total des candidats en phase principale",
                  names='Filière de formation très agrégée')
     fig.show()

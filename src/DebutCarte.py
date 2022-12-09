@@ -65,7 +65,7 @@ def createAllMap(dataframe):
     map.save("src\Carte_toute_formation.html")
 
 def main():
-    c = pd.read_csv("fr-esr-parcoursup.csv", sep = ";")
+    c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep =";")
     coordTemp = c["Coordonnées GPS de la formation"]
     for i in range(len(coordTemp)):
         if(type(coordTemp[i]) != str):

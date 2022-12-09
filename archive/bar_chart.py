@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def main():
-    full_df = pd.read_csv("fr-esr-parcoursup.csv", sep=";")
+    full_df = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
     formations = full_df["Filière de formation très agrégée"].unique()
     fille = list()
     garcon = list()
