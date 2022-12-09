@@ -80,7 +80,7 @@ if __name__ == '__main__':
     app.layout = html.Div(children=[
 
                             html.H1(children=f'Titre de la page',
-                                        style={'textAlign': 'center', 'color': '#7FDBFF'}),
+                                    style={'Position' : 'relative','width' : '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
                             
                             dcc.Dropdown(
                                 id = "Change",
@@ -102,7 +102,7 @@ if __name__ == '__main__':
                             
                             html.Iframe(
                                 id = 'mapParFormation',
-                                srcDoc = open("src\Carte_toute_formation.html",'r').read(),
+                                srcDoc = open("../templates/Carte_toute_formation.html",'r').read(),
                                 width = '60%',
                                 height = '600'
                             ),
@@ -114,7 +114,8 @@ if __name__ == '__main__':
                                 figure=fig
                             ),    
                                 
-                            html.Div(children=f'''
+                            html.Div(
+                                children=f'''
                                 자유로운 기분, I like that
                                 고민 따윈 already done, done (done, done)
                                 색안경 끼고 보는 게 죄지
