@@ -12,4 +12,5 @@ class PieChart(BasicChart):
 
     def render_chart(self):
         fig = px.pie(self.data, values=self.values, names=self.names)
-        return fig
+        # return fig
+        fig.show()

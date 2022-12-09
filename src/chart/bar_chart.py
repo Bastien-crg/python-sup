@@ -25,3 +25,4 @@ class BarChart(BasicChart):
         ])
         fig.update_layout(barmode='group')
         return fig
+        # fig.show()
