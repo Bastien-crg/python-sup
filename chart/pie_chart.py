@@ -1,5 +1,4 @@
 import plotly.express as px
-
 from chart.basic_chart import BasicChart
 
 
