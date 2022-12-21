@@ -56,11 +56,11 @@ if __name__ == '__main__':
                      color="continent",
                      size="pop",
                      hover_name="country")  # (4)
-
+    
     l = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
 
     fig2 = px.histogram(data_frame=l, x="Capacité de l’établissement par formation")
-
+    print(type(fig2))
     app.layout = html.Div(children=[
 
         html.H1(children=f'Capacité de l’établissement par formation ({year})',

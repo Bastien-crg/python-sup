@@ -1,6 +1,6 @@
 from file_manager import FileManager
 from chart import RankChart
-
+from chart import BarChart
 
 def main():
     file_manager = FileManager("../data/fr-esr-parcoursup.csv")
@@ -19,9 +19,11 @@ def main():
     pie_chart = PieChart(data, values="Effectif total des candidats en phase principale",
                          names='Filière de formation très agrégée')
     # pie_chart.render_chart()"""
-    rank_chart = RankChart(data)
-    rank_chart.render_chart()
-
+    # rank_chart = RankChart(data)
+    # rank_chart.render_chart()
+    bar_chart = BarChart(data, column="Filière de formation très agrégée")
+    bar_chart.render_chart()
+    bar_chart.show()
 
 
 

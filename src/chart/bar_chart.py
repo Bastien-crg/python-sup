@@ -1,5 +1,5 @@
 import plotly.graph_objects as go
-from src.chart.basic_chart import BasicChart
+from chart.basic_chart import BasicChart
 
 
 class BarChart(BasicChart):
@@ -11,7 +11,7 @@ class BarChart(BasicChart):
         self.formations = None
         self.column = parameters["column"]
         self.set_data(data)
-
+        
     def render_chart(self):
         self.formations = self.data[self.column].unique()
         for i in self.formations:
