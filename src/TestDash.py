@@ -15,6 +15,15 @@ import pandas as pd
 import DebutCarte
 
 from file_manager import FileManager
+from chart import RankChart
+from chart import BarChart
+from chart import PieChart
+from chart import Histogram
+
+
+import plotly.graph_objects as go
+
+
 
 def read_file(filename):
     l = []
@@ -23,14 +32,6 @@ def read_file(filename):
         for row in reader:
             l.append(row)
     return l
-
-
-def test():
-    l = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
-
-    fig = px.histogram(data_frame=l, x="Capacité de l’établissement par formation")
-    # fig = px.histogram(data_frame=sorted(l, key=lambda d: int(d['Capacité de l’établissement par formation'])), x="Capacité de l’établissement par formation", nbins=10)
-    fig.show()
 
 #
 # Data
@@ -42,20 +43,48 @@ gapminder = px.data.gapminder() # (1)
 years = gapminder["year"].unique()
 data = { year:gapminder.query("year == @year") for year in years} # (2)
 
+
+
+def create_Bar_chart(data, column_Name):
+    bar_chart = BarChart(data, column=column_Name)
+    fig = bar_chart.render_chart()
+    return fig
+
+def create_Basic_chart(data):
+    return
+
+def create_Histogram(data,x_name,nbins = 20,max_value = 199):
+    histo = Histogram(data, x=x_name, nbins=nbins, max_value=max_value)
+    fig =  histo.render_chart()
+    return fig
+    
+def create_Pie_chart(data,values_name,names):
+    pie_chart = PieChart(data, values=values_name,
+                         names=names)
+    fig =  pie_chart.render_chart()
+    return fig
+
+def create_Rank_chart(data):
+    rank_chart = RankChart(data)
+    fig =  rank_chart.render_chart()
+    return fig
+    
+
+
 #
 # Main
 #
 
 if __name__ == '__main__':
     
-    print("AFFICHAGE")
-    df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-    })
+    file_manager = FileManager("../data/fr-esr-parcoursup.csv")
+    file_list = file_manager.open_file()
 
-    fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+    data = file_list[0]
+        
+    bar_chart = BarChart(data, column="Filière de formation très agrégée")
+    fig = bar_chart.render_chart()
+    print("AFFICHAGE")
     
     app = dash.Dash(__name__) # (3)
     disableInter = False
@@ -74,7 +103,7 @@ if __name__ == '__main__':
                             html.Div(
                                 id = "Map_Par_Formation",
                                 hidden = False,
-                                
+                                style = { 'position' : 'relative','width' : '50%','padding' : 10 , 'float':'right'},
                                 children = [
                                 
                                 dcc.Dropdown(
@@ -93,35 +122,46 @@ if __name__ == '__main__':
                                         {'label' : "License_Las",'value':"License_Las"}
                                     ],
                                     value='All'
-                                    #style = { 'position' : 'relative','width' : '78%','padding' : 10 , 'float':'right'}
                                 ), 
                             
                                 html.Iframe(
                                     id = 'mapParFormation',
                                     srcDoc = open("../templates/Carte_toute_formation.html",'r').read(),
-                                    height = '550',
-                                    width = '60%'
-                                    #style = { 'position' : 'relative','width' : '60%','padding' : 10 , 'float':'right'}
+                                    width = '100%',
+                                    height = '650',
                                 ),
                                 
                             ]), 
                             
-                            html.Button('hideTest', id='hideTest', n_clicks=0),
+                            
                             
                             html.Div(
                                 id = 'Div_test',
                                 hidden = False,
-                                
-                                children=f'''
-                                자유로운 기분, I like that
-                                고민 따윈 already done, done (done, done)
-                                색안경 끼고 보는 게 죄지
-                                That's not my fault, woah
-                                Told ya I don't care at all
-                                내 멋대로 갈 거야 (oh-oh)
-                                필요 없어 order
-                                Don't need no guidance, I'm makin' my way
-                            '''), # (7)
+                                style = { 'position' : 'relative','width' : '100%','padding' : 10 , 'float':'left'},
+                                children= [
+                                    html.Button('hideTest', id='hideTest', n_clicks=0),
+                                    html.Button('showFig', id='showFig', n_clicks=0),
+                                    html.Span(id="PlayFig", hidden = True),
+                                    dcc.Slider(
+                                            id="graph-slider",
+                                            min=1,
+                                            max=4,
+                                            step=1,
+                                            marks={
+                                                1: 'bar_chart',
+                                                2: 'rank_chart',
+                                                3: 'histogram',
+                                                4: 'pie_chart',
+                                            },
+                                            value=1,
+                                        ), 
+                                    dcc.Graph(
+                                            id="graph",
+                                            figure=fig
+                                        ),
+                                ]
+                            ), # (7)
                             
                             
                             
@@ -143,9 +183,39 @@ if __name__ == '__main__':
 )
     def chooseFormation(n_clicks):
         if n_clicks%2 == 0:
-            return True
-        return False
+            return False
+        return True
     
+    @app.callback(
+    Output("PlayFig", "hidden"), [Input("showFig", "n_clicks")]
+)
+    def chooseFormation(n_clicks):
+        if n_clicks:
+            print(n_clicks)
+            fig.show()
+        n_clicks = 0
+        return True
+    
+    
+    @app.callback(
+        Output(component_id='graph', component_property='figure'),  # (1)
+        [Input(component_id='graph-slider', component_property='value')]  # (2)
+    )
+    def update_figure(input_value):
+        global fig 
+        match input_value:
+            case 1:
+                fig = create_Bar_chart(data,"Filière de formation très agrégée")
+                return fig
+            case 2:
+                fig =  create_Rank_chart(data)
+                return fig
+            case 3:
+                fig =  create_Histogram(data,"Capacité de l’établissement par formation")
+                return fig
+            case 4:
+                fig =  create_Pie_chart(data, "Effectif total des candidats en phase principale",'Filière de formation très agrégée')
+                return fig
     
     #
     # RUN APP
