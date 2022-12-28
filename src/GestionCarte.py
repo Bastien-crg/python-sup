@@ -1,5 +1,4 @@
-import geojson, geopandas, folium
-import pandas as pd
+import folium
 import math
 
 def functionTransform(data):
@@ -42,7 +41,7 @@ def mapTouteFormation(dataframe):
         ).add_to(map)
     return map   
 
-def mapParFilièreTresAgrégée(dataframe,name):
+def mapParFiliereTresAgregee(dataframe,name):
     coordsFrance = (46.539758, 2.430331)
     lstName = dataframe[(dataframe["Filière de formation très agrégée"] == name)]
     map2 = folium.Map(location=coordsFrance, tiles='OpenStreetMap', zoom_start=6)
@@ -59,21 +58,10 @@ def mapParFilièreTresAgrégée(dataframe,name):
 def createAllMap(dataframe):
     lstNameFormation = ["BTS","Ecole d'Ingénieur","Licence","Ecole de Commerce","CPGE","BUT","IFSI","EFTS","PASS",]
     for name in lstNameFormation :
-        map = mapParFilièreTresAgrégée(dataframe,name)
+        map = mapParFiliereTresAgregee(dataframe,name)
         map.save("../templates/Carte_par_formation_{}.html".format(name))
     map = mapTouteFormation(dataframe)
     map.save("../templates/Carte_toute_formation.html")
 
-def main():
-    c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep =";")
-    coordTemp = c["Coordonnées GPS de la formation"]
-    for i in range(len(coordTemp)):
-        if(type(coordTemp[i]) != str):
-            c = c.drop(labels=i,axis=0)
-    createAllMap(c)
-    
-    
-if __name__ == '__main__':
-    main()
     
 
