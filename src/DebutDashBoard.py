@@ -6,7 +6,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Output,Input
+from dash.dependencies import Output, Input
 
 import csv
 import plotly.express as px
@@ -15,7 +15,8 @@ import pandas as pd
 from file_manager import FileManager
 from src.chart.pie_chart import PieChart
 
-import DebutCarte 
+import DebutCarte
+
 
 def read_file(filename):
     l = []
@@ -33,89 +34,90 @@ def test():
     # fig = px.histogram(data_frame=sorted(l, key=lambda d: int(d['Capacité de l’établissement par formation'])), x="Capacité de l’établissement par formation", nbins=10)
     fig.show()
 
+
 #
 # Data
 #
 
 year = 2007
 
-gapminder = px.data.gapminder() # (1)
+gapminder = px.data.gapminder()  # (1)
 years = gapminder["year"].unique()
-data = { year:gapminder.query("year == @year") for year in years} # (2)
+data = {year: gapminder.query("year == @year") for year in years}  # (2)
 
 #
 # Main
 #
 
 if __name__ == '__main__':
-    
+
     df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
+        "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
+        "Amount": [4, 1, 2, 2, 4, 5],
+        "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
     })
 
     fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
-    
+
     print(type(fig))
-    
+
     file_manager = FileManager("fr-esr-parcoursup.csv")
     file_list = file_manager.open_file()
 
     data = file_list[0]
     pie_chart = PieChart(data, values="Effectif total des candidats en phase principale",
                          names='Filière de formation très agrégée')
-    
+
     print(type(pie_chart))
-    
-    app = dash.Dash(__name__) # (3)
+
+    app = dash.Dash(__name__)  # (3)
     disableInter = False
-    c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep =";")
+    c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
     coordTemp = c["Coordonnées GPS de la formation"]
     for i in range(len(coordTemp)):
-        if(type(coordTemp[i]) != str):
-            c = c.drop(labels=i,axis=0)
+        if (type(coordTemp[i]) != str):
+            c = c.drop(labels=i, axis=0)
     DebutCarte.createAllMap(c)
 
     app.layout = html.Div(children=[
 
-                            html.H1(children=f'Titre de la page',
-                                    style={'Position' : 'relative','width' : '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
-                            
-                            dcc.Dropdown(
-                                id = "Change",
-                                options = [
-                                    {'label' : 'All','value':'All'},
-                                    {'label' : 'BTS','value':'BTS'},
-                                    {'label' : "Ecole d'Ingénieur",'value':"Ecole d'Ingénieur"},
-                                    {'label' : 'Licence','value':'Licence'},
-                                    {'label' : "Ecole de Commerce",'value':"Ecole de Commerce"},
-                                    {'label' : 'CPGE','value':'CPGE'},
-                                    {'label' : 'IFSI','value':'IFSI'},
-                                    {'label' : 'EFTS','value':'EFTS'},
-                                    {'label' : 'PASS','value':'PASS'},
-                                    {'label' : 'Autre formation','value':'Autre formation'},
-                                    {'label' : "License_Las",'value':"License_Las"}
-                                ],
-                                value='All'
-                            ),
-                            
-                            html.Iframe(
-                                id = 'mapParFormation',
-                                srcDoc = open("../templates/Carte_toute_formation.html",'r').read(),
-                                width = '60%',
-                                height = '600'
-                            ),
-                            html.Div(children='''
+        html.H1(children=f'Titre de la page',
+                style={'Position': 'relative', 'width': '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
+
+        dcc.Dropdown(
+            id="Change",
+            options=[
+                {'label': 'All', 'value': 'All'},
+                {'label': 'BTS', 'value': 'BTS'},
+                {'label': "Ecole d'Ingénieur", 'value': "Ecole d'Ingénieur"},
+                {'label': 'Licence', 'value': 'Licence'},
+                {'label': "Ecole de Commerce", 'value': "Ecole de Commerce"},
+                {'label': 'CPGE', 'value': 'CPGE'},
+                {'label': 'IFSI', 'value': 'IFSI'},
+                {'label': 'EFTS', 'value': 'EFTS'},
+                {'label': 'PASS', 'value': 'PASS'},
+                {'label': 'Autre formation', 'value': 'Autre formation'},
+                {'label': "License_Las", 'value': "License_Las"}
+            ],
+            value='All'
+        ),
+
+        html.Iframe(
+            id='mapParFormation',
+            srcDoc=open("../templates/Carte_toute_formation.html", 'r').read(),
+            width='60%',
+            height='600'
+        ),
+        html.Div(children='''
                                 Dash: A web application framework for your data.
                             '''),
-                            dcc.Graph(
-                                id='example-graph',
-                                figure=fig
-                            ),    
-                                
-                            html.Div(
-                                children=f'''
+        dcc.Graph(
+            id='example-graph',
+            figure=fig
+        ),
+
+        html.Div(
+            children=f'''
                                 자유로운 기분, I like that
                                 고민 따윈 already done, done (done, done)
                                 색안경 끼고 보는 게 죄지
@@ -124,13 +126,12 @@ if __name__ == '__main__':
                                 내 멋대로 갈 거야 (oh-oh)
                                 필요 없어 order
                                 Don't need no guidance, I'm makin' my way
-                            '''), # (7)
-                            
-                            
-                            
-                            html.Span(id="ChangeClick",style={"verticalAlign" : "middle"}),
+                            '''),  # (7)
+
+        html.Span(id="ChangeClick", style={"verticalAlign": "middle"}),
     ]
     )
+
 
     # # Permet de changer la date; possible de faire la meme mais pour les cartes avec les départements
     # @app.callback(
@@ -142,17 +143,16 @@ if __name__ == '__main__':
     #                     color="continent",
     #                     size="pop",
     #                     hover_name="country") # (4)
-    
-#     @app.callback(
-#     Output("interval", "disabled"), [Input("Play", "n_clicks")], State("interval","disabled"),
-# )
-#     def toogle(n,playing):
-#         if n:
-#             return not playing
-#         else:
-#             return playing
-    
-    
+
+    #     @app.callback(
+    #     Output("interval", "disabled"), [Input("Play", "n_clicks")], State("interval","disabled"),
+    # )
+    #     def toogle(n,playing):
+    #         if n:
+    #             return not playing
+    #         else:
+    #             return playing
+
     # @app.callback(
     # Output("ChangeClick", "children"), [Input("Change", "n_clicks")]
     # )
@@ -161,22 +161,18 @@ if __name__ == '__main__':
     #         return "Not clicked."
     #     else:
     #         return f"Clicked {n} times."
-    
+
     @app.callback(
-    Output("mapParFormation", "srcDoc"), [Input("Change", "value")],
-)
+        Output("mapParFormation", "srcDoc"), [Input("Change", "value")],
+    )
     def chooseFormation(name):
         if name == "All":
-            return open("src\Carte_toute_formation.html",'r').read()
-        return open("src\Carte_par_formation_{}.html".format(name),'r').read()
-    
-    
-    
-    
-    
+            return open("src\Carte_toute_formation.html", 'r').read()
+        return open("src\Carte_par_formation_{}.html".format(name), 'r').read()
+
+
     #
     # RUN APP
     #
 
-    app.run_server(debug=True) # (8)
-    
+    app.run_server(debug=True)  # (8)
