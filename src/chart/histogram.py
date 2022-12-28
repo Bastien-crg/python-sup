@@ -16,6 +16,5 @@ class Histogram(BasicChart):
         self.data = self.data.loc[self.data[self.x] <= self.max_value]
         fig = px.histogram(data_frame=self.data, x=self.x, nbins=self.nbins)
         return fig
-        # fig.show()
 
 
