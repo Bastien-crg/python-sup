@@ -21,5 +21,5 @@ class RankChart(BasicChart):
         self.data = self.data.sort_values(by=['nb_of_form'])
         cities = self.data[self.data["nb_of_form"] > 150]
         fig = go.Figure(go.Bar(x=cities["nb_of_form"], y=cities[0], orientation='h'))
-        fig.show()
+
         return fig
