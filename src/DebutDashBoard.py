@@ -75,7 +75,7 @@ if __name__ == '__main__':
     c = pd.read_csv("../data/fr-esr-parcoursup.csv", sep=";")
     coordTemp = c["Coordonnées GPS de la formation"]
     for i in range(len(coordTemp)):
-        if (type(coordTemp[i]) != str):
+        if type(coordTemp[i]) != str:
             c = c.drop(labels=i, axis=0)
     DebutCarte.createAllMap(c)
 
