@@ -46,25 +46,6 @@ def main():
     empty = EmptyChart()
     empty.render_chart()
     """
-    # chiffre clé
-    nombre_formation = len(data.index)
-    print(nombre_formation)
-
-    nombre_etablissement = data['Établissement'].nunique()
-    print(nombre_etablissement)
-
-    nombre_ecole_inge = data.loc[(data['Filière de formation très agrégée'] == "Ecole d'Ingénieur")]["Établissement"].nunique()
-    print(nombre_ecole_inge)
-
-    nombre_commune = data['Commune de l’établissement'].nunique()
-    print(nombre_commune)
-
-    pourcentage_selectif = len(data.loc[(data['Sélectivité'] == "formation sélective")].index) / nombre_formation * 100
-    print(pourcentage_selectif)
-
-    pourcentage_public = len(data.loc[(data['Statut de l’établissement de la filière de formation (public, privé…)'] == "Public")].index) / nombre_formation * 100
-    print(pourcentage_public)
-
     main_Dash()
 
 

@@ -9,13 +9,14 @@ from dash import html
 from dash.dependencies import Output, Input
 import dash_bootstrap_components as dbc
 
-import GestionCarte
+import src.GestionCarte as GestionCarte
 
-from file_manager import FileManager
-from chart import RankChart
-from chart import BarChart
-from chart import PieChart
-from chart import Histogram
+from src.file_manager import FileManager
+from src.chart import RankChart
+from src.chart import BarChart
+from src.chart import PieChart
+from src.chart import Histogram
+from src.chart import ScatterChart
 
 
 def create_Bar_chart(data, column_Name, selected_formation=[]):
@@ -24,8 +25,10 @@ def create_Bar_chart(data, column_Name, selected_formation=[]):
     return fig
 
 
-def create_Basic_chart(data):
-    return
+def create_scatter_chart(data,abscisse,ordonee):
+    scatter_chart = ScatterChart(data, abscisse="Capacité de l’établissement", ordonne="Nombre de formations par établissement")
+    fig = scatter_chart.render_chart()
+    return fig
 
 
 def create_Histogram(data, x_name, nbins=20, max_value=199):
@@ -37,7 +40,7 @@ def create_Histogram(data, x_name, nbins=20, max_value=199):
 def create_Pie_chart(data, values_name, names):
     pie_chart = PieChart(data, values=values_name,
                          names=names)
-    fig = pie_chart.render_chart(title="Choix des élèves")
+    fig = pie_chart.render_chart(title=values_name)
     return fig
 
 
@@ -49,13 +52,13 @@ def create_Rank_chart(data):
 def choose_year_file(date):
     match date:
         case 2021:
-            return "../data/fr-esr-parcoursup-2021.csv"
+            return "data/fr-esr-parcoursup-2021.csv"
         case 2020:
-            return "../data/fr-esr-parcoursup-2020.csv"
+            return "data/fr-esr-parcoursup-2020.csv"
         case 2019:
-            return "../data/fr-esr-parcoursup-2019.csv"
+            return "data/fr-esr-parcoursup-2019.csv"
         case 2018:
-            return "../data/fr-esr-parcoursup-2018.csv"
+            return "data/fr-esr-parcoursup-2018.csv"
 
 def open_data(date):
     file_name = choose_year_file(date)
@@ -73,9 +76,18 @@ def init_maps(data):
             data = data.drop(labels=i, axis=0)
     GestionCarte.createAllMap(data)
 
+def init_pie_chart(data):
+    global pie_chart_choix
+    global pie_chart_admis
+    
+    pie_chart_choix=create_Pie_chart(data, "Effectif total des candidats en phase principale",'Filière de formation très agrégée')
+    pie_chart_admis=create_Pie_chart(data, "Effectif total des candidats ayant accepté la proposition de l’établissement (admis)",'Filière de formation très agrégée')
+    
+    
 def init_dash(date):
     data = open_data(date)
     init_card(data)
+    init_pie_chart(data)
     bar_chart = BarChart(data, column="Filière de formation très agrégée", selected_formations=[])
     fig = bar_chart.render_chart()
     return data, fig
@@ -228,6 +240,20 @@ def main_Dash():
                         ),
                         ]
                     ),
+                
+                html.Div(
+                    id ="pie_chart",
+                    style={'position': 'relative', 'width': '95%', 'float': 'left'},
+                    children =[
+                        dcc.Tabs(
+                            id = "tabs_pie_chart",
+                            children=[
+                                dcc.Tab(label ="Repartitions des choix des élèves",children=[dcc.Graph(figure = pie_chart_choix)]),
+                                dcc.Tab(label = "Effectif total des candidats ayant accepté la proposition de l’établissement",children=[dcc.Graph(figure = pie_chart_admis)])
+                            ]
+                        ),
+                    ]
+                )
                 ]
             ),
     
@@ -258,7 +284,7 @@ def main_Dash():
 
                 html.Iframe(
                     id='mapParFormation',
-                    srcDoc=open("../templates/Carte_toute_formation.html", 'r').read(),
+                    srcDoc=open("templates/Carte_toute_formation.html", 'r').read(),
                     width='100%',
                     height='650',
                 ),
@@ -311,7 +337,7 @@ def main_Dash():
                     ]
                 )
             ]
-        ),  # (7)
+        ),
 
         html.Span(id="ChangeClick", style={"verticalAlign": "middle"}),
     ]
@@ -322,8 +348,8 @@ def main_Dash():
     )
     def choose_map_Formation(name):
         if name == "All":
-            return open("../templates/Carte_toute_formation.html", 'r').read()
-        return open("../templates/Carte_par_formation_{}.html".format(name), 'r').read()
+            return open("templates/Carte_toute_formation.html", 'r').read()
+        return open("templates/Carte_par_formation_{}.html".format(name), 'r').read()
 
     @app.callback(
         Output("Div_Graph", "hidden"), [Input("hideGraph", "n_clicks")],
@@ -363,7 +389,7 @@ def main_Dash():
                 fig = create_Pie_chart(data, "Effectif total des candidats en phase principale",
                                        'Filière de formation très agrégée')
                 return fig, True
-
+    
     #
     # RUN APP
     #
