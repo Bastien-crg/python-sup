@@ -8,13 +8,13 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Output, Input
 
-import GestionCarte
+import src.GestionCarte as GestionCarte
 
-from file_manager import FileManager
-from chart import RankChart
-from chart import BarChart
-from chart import PieChart
-from chart import Histogram
+from src.file_manager import FileManager
+from src.chart import RankChart
+from src.chart import BarChart
+from src.chart import PieChart
+from src.chart import Histogram
 
 
 def create_Bar_chart(data, column_Name, selected_formation=[]):

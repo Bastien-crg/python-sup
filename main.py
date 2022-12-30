@@ -1,11 +1,11 @@
-from file_manager import FileManager
-from chart import RankChart
-from chart import Histogram
-from chart import BarChart
-from chart import PieChart
-from chart import ScatterChart
-from chart import EmptyChart
-from Dash import main_Dash
+from src.file_manager import FileManager
+from src.chart import RankChart
+from src.chart import Histogram
+from src.chart import BarChart
+from src.chart import PieChart
+from src.chart import ScatterChart
+from src.chart import EmptyChart
+from src.Dash import main_Dash
 
 
 def main():
@@ -62,7 +62,8 @@ def main():
     pourcentage_public = len(data.loc[(data['Statut de l’établissement de la filière de formation (public, privé…)'] == "Public")].index) / nombre_formation * 100
     print(pourcentage_public)
 
-    # main_Dash()
+    main_Dash()
+
 
 if __name__ == '__main__':
     main()
