@@ -11,17 +11,5 @@ class PieChart(BasicChart):
         self.set_data(data)
 
     def render_chart(self, **parameters):
-        fig = px.pie(self.data, values=self.values, names=self.names, title=parameters["title"],
-                     color_discrete_map={'Licence': 'blue',
-                                         'BTS': 'red',
-                                         'IFSI': 'lime',
-                                         'BUT': 'violet',
-                                         'CPGE': 'orange',
-                                         'PASS': 'cyan',
-                                         'Autre formation': 'pink',
-                                         'Ecole d\'ingénieur': 'green',
-                                         'Licence_Las': 'cyan',
-                                         'Ecole de commerce': 'yellow',
-                                         'EFTS': 'white'
-                                         })
+        fig = px.pie(self.data, values=self.values, names=self.names, title=parameters["title"])
         return fig
