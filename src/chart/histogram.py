@@ -1,6 +1,6 @@
 import plotly.express as px
 
-from chart.basic_chart import BasicChart
+from .basic_chart import BasicChart
 
 
 class Histogram(BasicChart):
@@ -14,7 +14,5 @@ class Histogram(BasicChart):
 
     def render_chart(self):
         self.data = self.data.loc[self.data[self.x] <= self.max_value]
-        fig = px.histogram(data_frame=self.data, x=self.x, nbins=self.nbins)
+        fig = px.histogram(data_frame=self.data, x=self.x, nbins=self.nbins, title="Répartition de la capacité des établissements")
         return fig
-
-

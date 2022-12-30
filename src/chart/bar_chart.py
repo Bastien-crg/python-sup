@@ -1,5 +1,5 @@
 import plotly.graph_objects as go
-from chart.basic_chart import BasicChart
+from .basic_chart import BasicChart
 
 
 class BarChart(BasicChart):
@@ -30,7 +30,7 @@ class BarChart(BasicChart):
             go.Bar(name='Garçon', x=self.formations, y=self.garcon),
             go.Bar(name='Fille', x=self.formations, y=self.fille)
         ])
-        fig.update_layout(barmode='group')
+        fig.update_layout(barmode='group', title_text='Répartition Fille/Garçon de chaque formation')
         return fig
 
     def render_chart_selected_formation(self):
@@ -47,5 +47,5 @@ class BarChart(BasicChart):
             go.Bar(name='Garçon', x=self.particulare_Formation, y=self.garcon),
             go.Bar(name='Fille', x=self.particulare_Formation, y=self.fille)
         ])
-        fig.update_layout(barmode='group')
+        fig.update_layout(barmode='group', title_text='Répartition Fille/Garçon de chaque formation')
         return fig

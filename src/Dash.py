@@ -36,7 +36,7 @@ def create_Histogram(data, x_name, nbins=20, max_value=199):
 def create_Pie_chart(data, values_name, names):
     pie_chart = PieChart(data, values=values_name,
                          names=names)
-    fig = pie_chart.render_chart()
+    fig = pie_chart.render_chart(title="Choix des élèves")
     return fig
 
 
@@ -62,12 +62,13 @@ def main_Dash():
         LICENCE_LAS="Licence_Las",
     )
 
+
     FORMATIONS_options = [
         {"label": str(FORMATIONS[formations]), "value": str(FORMATIONS[formations])}
         for formations in FORMATIONS
     ]
 
-    file_manager = FileManager("../data/fr-esr-parcoursup.csv")
+    file_manager = FileManager("./data/fr-esr-parcoursup-2021.csv")
     file_list = file_manager.open_file()
     data = file_list[0]
     bar_chart = BarChart(data, column="Filière de formation très agrégée", selected_formations=[])
@@ -112,7 +113,7 @@ def main_Dash():
 
                 html.Iframe(
                     id='mapParFormation',
-                    srcDoc=open("../templates/Carte_toute_formation.html", 'r').read(),
+                    srcDoc=open("./templates/Carte_toute_formation.html", 'r').read(),
                     width='100%',
                     height='650',
                 ),
@@ -176,8 +177,8 @@ def main_Dash():
     )
     def choose_map_Formation(name):
         if name == "All":
-            return open("../templates/Carte_toute_formation.html", 'r').read()
-        return open("../templates/Carte_par_formation_{}.html".format(name), 'r').read()
+            return open("./templates/Carte_toute_formation.html", 'r').read()
+        return open("./templates/Carte_par_formation_{}.html".format(name), 'r').read()
 
     @app.callback(
         Output("Div_Graph", "hidden"), [Input("hideGraph", "n_clicks")],

@@ -1,6 +1,6 @@
 
 import plotly.express as px
-from src.chart.basic_chart import BasicChart
+from .basic_chart import BasicChart
 import pandas as pd
 
 
@@ -21,8 +21,9 @@ class ScatterChart(BasicChart):
         self.backup_data["counting"] = 1
         for index, row in self.data.iterrows():
             self.data.at[index, self.abscisse] = self.backup_data.loc[
-                self.backup_data["Établissement"] == row[0], self.abscisse].sum()
+                self.backup_data["Établissement"] == row[0], "Capacité de l’établissement par formation"].sum()
             self.data.at[index, self.ordonne] = self.backup_data.loc[
-                self.backup_data["Établissement"] == row[0], self.ordonne].sum()
-        fig = px.scatter(self.data, x=self.abscisse, y=self.ordonne, hover_data=["Établissement"], log_x=True, log_y=True)
-        return fig
+                self.backup_data["Établissement"] == row[0], "counting"].sum()
+        fig = px.scatter(self.data, x=self.abscisse, y=self.ordonne, hover_data=["Établissement"], log_x=True, log_y=True,title="Capacité des établissements en fonction de leur nombre de formations")
+        # return fig
+        fig.show()

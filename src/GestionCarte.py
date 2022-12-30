@@ -67,6 +67,6 @@ def createAllMap(dataframe):
                         "PASS", ]
     for name in lstNameFormation:
         map = mapParFiliereTresAgregee(dataframe, name)
-        map.save("../templates/Carte_par_formation_{}.html".format(name))
+        map.save("./templates/Carte_par_formation_{}.html".format(name))
     map = mapTouteFormation(dataframe)
-    map.save("../templates/Carte_toute_formation.html")
+    map.save("./templates/Carte_toute_formation.html")
