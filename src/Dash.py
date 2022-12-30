@@ -68,7 +68,11 @@ def main_Dash():
         for formations in FORMATIONS
     ]
 
+<<<<<<< HEAD
     file_manager = FileManager("./data/fr-esr-parcoursup-2021.csv")
+=======
+    file_manager = FileManager("../data/fr-esr-parcoursup-2021.csv")
+>>>>>>> b4b9a9f473fc4581b1ede381570aa02ddd03dc25
     file_list = file_manager.open_file()
     data = file_list[0]
     bar_chart = BarChart(data, column="Filière de formation très agrégée", selected_formations=[])
@@ -149,7 +153,7 @@ def main_Dash():
                             id='Dropdown-bar_chart-holder',
                             hidden=False,
                             children=[
-                                html.Label('Sélection des formations souhaitées.'),
+                                html.H4(children=f'Sélection des formations souhaitées',),
                                 dcc.Dropdown(
 
                                     options=FORMATIONS_options,
