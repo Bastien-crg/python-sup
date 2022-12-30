@@ -28,7 +28,7 @@ def main():
     bar_chart = BarChart(data, column="Filière de formation")
     bar_chart.render_chart()
 
-    pie_chart = PieChart(data, values="Effectif total des candidats en phase principale",names='Filière de formation très agrégée')
+    pie_chart = PieChart(data, values="Effectif total des candidats pour une formation",names='Filière de formation très agrégée')
     pie_chart.render_chart(title="test")
 
     pie_chart = PieChart(data, values="Effectif total des candidats ayant accepté la proposition de l’établissement (admis)",names='Filière de formation très agrégée')

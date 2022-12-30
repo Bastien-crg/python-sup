@@ -175,7 +175,7 @@ def init_card(data,date):
                     str(len(data.loc[(data['Sélectivité'] == "formation sélective")].index) / len(
                         data.index) * 100) + " %",
                     className="card-text",
-                    style={'textAlign': 'center', 'font-size': '40px'},
+                    style={'textAlign': 'center'},
                 ),
             ]
         ),
