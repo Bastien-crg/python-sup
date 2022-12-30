@@ -17,6 +17,7 @@ from src.chart import BarChart
 from src.chart import PieChart
 from src.chart import Histogram
 from src.chart import ScatterChart
+from src.chart import EmptyChart
 
 
 def create_Bar_chart(data, column_Name, selected_formation=[]):
@@ -24,10 +25,8 @@ def create_Bar_chart(data, column_Name, selected_formation=[]):
     fig = bar_chart.render_chart()
     return fig
 
-
-def create_scatter_chart(data, abscisse, ordonee):
-    scatter_chart = ScatterChart(data, abscisse="Capacité de l’établissement",
-                                 ordonne="Nombre de formations par établissement")
+def create_scatter_chart(data,abscisse,ordonee):
+    scatter_chart = ScatterChart(data, abscisse=abscisse, ordonne=ordonee)
     fig = scatter_chart.render_chart()
     return fig
 
@@ -50,6 +49,10 @@ def create_Rank_chart(data):
     fig = rank_chart.render_chart()
     return fig
 
+def create_Empty_chart():
+    empty_chart = EmptyChart()
+    fig = empty_chart.render_chart()
+    return fig
 
 def choose_year_file(date):
     match date:
@@ -92,20 +95,21 @@ def init_pie_chart(data):
 
 def init_dash(date):
     data = open_data(date)
-    init_card(data)
+    init_card(data,date)
     init_pie_chart(data)
     bar_chart = BarChart(data, column="Filière de formation très agrégée", selected_formations=[])
     fig = bar_chart.render_chart()
     return data, fig
 
 
-def init_card(data):
+def init_card(data,date):
     global card_nb_etablissement_content
     global card_nb_formations_content
     global card_nb_ecole_inge_content
     global card_nb_forma_commune_content
     global card_pourcentage_selectif_content
     global card_pourcentage_public_content
+
 
     card_nb_etablissement_content = [
         dbc.CardBody(
@@ -194,6 +198,91 @@ def init_card(data):
     ]
 
 
+
+    
+    if date == 2021:
+        nb_commune = str(data['Commune de l’établissement'].nunique()) 
+    else:
+        nb_commune = "NON DISPONIBLE"
+    
+    card_nb_etablissement_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre d'établissement", className="card_nb_etablissement",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        data['Établissement'].nunique(),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                    
+    card_nb_formations_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre de formations", className="card_nb_formations",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        len(data.index),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                
+    card_nb_ecole_inge_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre d'écoles d'ingénieur disponible", className="card_nb_ecole_inge",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        data.loc[(data['Filière de formation très agrégée'] == "Ecole d'Ingénieur")]["Établissement"].nunique(),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                
+                
+    card_nb_forma_commune_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre de commune avec une formation", className="card_nb_forma_commune",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        nb_commune,
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                        ]
+    
+    card_pourcentage_selectif_content = [       
+                                dbc.CardBody(
+                                        [
+                                            html.H4("Pourcentage des formations selectives ", className="card_pourcentage_selectif",style={'textAlign' : 'center'}),
+                                            html.H2(
+                                                str(len(data.loc[(data['Sélectivité'] == "formation sélective")].index) / len(data.index) * 100) + " %",
+                                                className="card-text",
+                                                style={'textAlign' : 'center'},
+                                            ),
+                                        ]
+                                    ),
+                            ]
+                   
+    card_pourcentage_public_content = [       
+                                dbc.CardBody(
+                                         [
+                                            html.H4("Pourcentage des formations public ", className="card_pourcentage_public",style={'textAlign' : 'center'}),
+                                            html.H2(
+                                                str(len(data.loc[(data['Statut de l’établissement de la filière de formation (public, privé…)'] == "Public")].index) / len(data.index) * 100) + " %",
+                                                className="card-text",
+                                                style={'textAlign' : 'center'},
+                                            ),
+                                        ]
+                                    ),
+                            ]
 def main_Dash():
     # Dictionnaire des formations possibles
     FORMATIONS = dict(
@@ -214,8 +303,9 @@ def main_Dash():
         {"label": str(FORMATIONS[formations]), "value": str(FORMATIONS[formations])}
         for formations in FORMATIONS
     ]
-
-    data, fig = init_dash(2021)
+    global date
+    date = 2021
+    data , fig = init_dash(date)
     app = dash.Dash(__name__)
     app.layout = html.Div(children=[
 
@@ -325,7 +415,7 @@ def main_Dash():
                                 1: 'bar_chart',
                                 2: 'rank_chart',
                                 3: 'histogram',
-                                4: 'pie_chart',
+                                4: 'scatter',
                             },
                             value=1,
                         ),
@@ -399,12 +489,11 @@ def main_Dash():
                 fig = create_Histogram(data, "Capacité de l’établissement par formation")
                 return fig, True
             case 4:
-                fig = create_Pie_chart(data, "Effectif total des candidats pour une formation",
-                                       'Filière de formation très agrégée')
+                fig = create_scatter_chart(data, "Capacité de l’établissement",'Nombre de formations par établissement')
                 return fig, True
 
     #
     # RUN APP
     #
 
-    app.run_server(debug=True)  # (8)
+    app.run_server(debug=True)
