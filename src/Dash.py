@@ -47,6 +47,7 @@ def create_Rank_chart(data):
 
 
 def main_Dash():
+    #Dictionnaire des formations possibles
     FORMATIONS = dict(
         BTS="BTS",
         LICENCE="Licence",
