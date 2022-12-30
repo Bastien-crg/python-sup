@@ -10,7 +10,10 @@ from src.Dash import main_Dash
 
 def main():
 
-    file_manager = FileManager("./data/fr-esr-parcoursup-2021.csv")
+    file_manager = FileManager("./data/fr-esr-parcoursup-2021.csv",
+                               "./data/fr-esr-parcoursup-2020.csv",
+                               "./data/fr-esr-parcoursup-2019.csv",
+                               "./data/fr-esr-parcoursup-2018.csv")
     file_list = file_manager.open_file()
 
     data = file_list[0]

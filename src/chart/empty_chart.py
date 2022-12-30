@@ -24,4 +24,4 @@ class EmptyChart(BasicChart):
                 }
             ]
         )
-        fig.show()
+        return fig

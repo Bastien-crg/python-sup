@@ -14,5 +14,5 @@ class Histogram(BasicChart):
 
     def render_chart(self):
         self.data = self.data.loc[self.data[self.x] <= self.max_value]
-        fig = px.histogram(data_frame=self.data, x=self.x, nbins=self.nbins, title="Répartition de la capacité des établissements")
+        fig = px.histogram(data_frame=self.data, x=self.x, nbins=self.nbins, title="Répartition de la capacité des formations")
         return fig

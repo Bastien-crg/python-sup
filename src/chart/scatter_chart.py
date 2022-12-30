@@ -25,5 +25,4 @@ class ScatterChart(BasicChart):
             self.data.at[index, self.ordonne] = self.backup_data.loc[
                 self.backup_data["Établissement"] == row[0], "counting"].sum()
         fig = px.scatter(self.data, x=self.abscisse, y=self.ordonne, hover_data=["Établissement"], log_x=True, log_y=True,title="Capacité des établissements en fonction de leur nombre de formations")
-        # return fig
-        fig.show()
+        return fig
