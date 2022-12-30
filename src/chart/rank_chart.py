@@ -1,10 +1,6 @@
 import pandas as pd
 import plotly.graph_objects as go
-<<<<<<< HEAD
 from .basic_chart import BasicChart
-=======
-from chart.basic_chart import BasicChart
->>>>>>> b4b9a9f473fc4581b1ede381570aa02ddd03dc25
 
 
 class RankChart(BasicChart):

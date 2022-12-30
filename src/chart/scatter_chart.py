@@ -1,10 +1,6 @@
 
 import plotly.express as px
-<<<<<<< HEAD
 from .basic_chart import BasicChart
-=======
-from chart.basic_chart import BasicChart
->>>>>>> b4b9a9f473fc4581b1ede381570aa02ddd03dc25
 import pandas as pd
 
 
