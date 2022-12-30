@@ -7,14 +7,15 @@ import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Output, Input
+import dash_bootstrap_components as dbc
 
-import src.GestionCarte as GestionCarte
+import GestionCarte
 
-from src.file_manager import FileManager
-from src.chart import RankChart
-from src.chart import BarChart
-from src.chart import PieChart
-from src.chart import Histogram
+from file_manager import FileManager
+from chart import RankChart
+from chart import BarChart
+from chart import PieChart
+from chart import Histogram
 
 
 def create_Bar_chart(data, column_Name, selected_formation=[]):
@@ -45,7 +46,128 @@ def create_Rank_chart(data):
     fig = rank_chart.render_chart()
     return fig
 
+def choose_year_file(date):
+    match date:
+        case 2021:
+            return "../data/fr-esr-parcoursup-2021.csv"
+        case 2020:
+            return "../data/fr-esr-parcoursup-2020.csv"
+        case 2019:
+            return "../data/fr-esr-parcoursup-2019.csv"
+        case 2018:
+            return "../data/fr-esr-parcoursup-2018.csv"
 
+def open_data(date):
+    file_name = choose_year_file(date)
+    file_manager = FileManager(file_name)
+    file_list = file_manager.open_file()
+    data = file_list[0]
+    return data
+
+
+
+def init_maps(data):
+    coordTemp = data["Coordonnées GPS de la formation"]
+    for i in range(len(coordTemp)):
+        if (type(coordTemp[i]) != str):  # Certaines formations n'ont pas de coordonnées GPS
+            data = data.drop(labels=i, axis=0)
+    GestionCarte.createAllMap(data)
+
+def init_dash(date):
+    data = open_data(date)
+    init_card(data)
+    bar_chart = BarChart(data, column="Filière de formation très agrégée", selected_formations=[])
+    fig = bar_chart.render_chart()
+    return data, fig
+
+def init_card(data):
+    global card_nb_etablissement_content
+    global card_nb_formations_content
+    global card_nb_ecole_inge_content
+    global card_nb_forma_commune_content
+    global card_pourcentage_selectif_content
+    global card_pourcentage_public_content
+    
+    card_nb_etablissement_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre d'établissement", className="card_nb_etablissement",style={'textAlign' : 'center'}),
+                                    html.P(
+                                        data['Établissement'].nunique(),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                    
+    card_nb_formations_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre de formations", className="card_nb_formations",style={'textAlign' : 'center'}),
+                                    html.P(
+                                        len(data.index),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                
+    card_nb_ecole_inge_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre d'écoles d'ingénieur disponible", className="card_nb_ecole_inge",style={'textAlign' : 'center'}),
+                                    html.P(
+                                        data.loc[(data['Filière de formation très agrégée'] == "Ecole d'Ingénieur")]["Établissement"].nunique(),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                
+                
+    card_nb_forma_commune_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre de commune avec une formation", className="card_nb_forma_commune",style={'textAlign' : 'center'}),
+                                    html.P(
+                                        data['Commune de l’établissement'].nunique(),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                        ]
+    
+    card_pourcentage_selectif_content = [       
+                                dbc.CardBody(
+                                        [
+                                            html.H4("Pourcentage des formations selectives ", className="card_pourcentage_selectif",style={'textAlign' : 'center'}),
+                                            html.P(
+                                                str(len(data.loc[(data['Sélectivité'] == "formation sélective")].index) / len(data.index) * 100) + " %",
+                                                className="card-text",
+                                                style={'textAlign' : 'center'},
+                                            ),
+                                        ]
+                                    ),
+                            ]
+                   
+    card_pourcentage_public_content = [       
+                                dbc.CardBody(
+                                         [
+                                            html.H4("Pourcentage des formations public ", className="card_pourcentage_public",style={'textAlign' : 'center'}),
+                                            html.P(
+                                                str(len(data.loc[(data['Statut de l’établissement de la filière de formation (public, privé…)'] == "Public")].index) / len(data.index) * 100) + " %",
+                                                className="card-text",
+                                                style={'textAlign' : 'center'},
+                                            ),
+                                        ]
+                                    ),
+                            ]
+    
+        
 def main_Dash():
     #Dictionnaire des formations possibles
     FORMATIONS = dict(
@@ -68,25 +190,48 @@ def main_Dash():
         for formations in FORMATIONS
     ]
 
-    file_manager = FileManager("./data/fr-esr-parcoursup-2021.csv")
-    file_list = file_manager.open_file()
-    data = file_list[0]
-    bar_chart = BarChart(data, column="Filière de formation très agrégée", selected_formations=[])
-    fig = bar_chart.render_chart()
-
-    app = dash.Dash(__name__)  # (3)
-    disableInter = False
-    coordTemp = data["Coordonnées GPS de la formation"]
-    for i in range(len(coordTemp)):
-        if (type(coordTemp[i]) != str):  # Certaines formations n'ont pas de coordonnées GPS
-            data = data.drop(labels=i, axis=0)
-    GestionCarte.createAllMap(data)
-
+    
+    
+    data , fig = init_dash(2021)
+    app = dash.Dash(__name__)
     app.layout = html.Div(children=[
 
         html.H1(children=f'Titre de la page',
                 style={'Position': 'relative', 'width': '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
-
+        
+        html.Div(
+            id = "Left_column",
+            style={'position': 'relative', 'width': '48%', 'float': 'left'},
+            children = [
+                html.Div(
+                    id = "Cards_Div",
+                    children = [
+                        html.Div(
+                            id = 'left_cards_div',
+                            style={'position': 'relative', 'width': '49%', 'float': 'left'},
+                            children = [
+                                dbc.Card(card_nb_etablissement_content,color="#edc6a2"),
+                                dbc.Card(card_nb_ecole_inge_content,color="#edc6a2"),
+                                dbc.Card(card_pourcentage_public_content,color="#edc6a2"),
+                            ]
+                        ),
+                        
+                        html.Div(
+                            id = "right_cards_div",
+                            style={'position': 'relative', 'width': '49%', 'float': 'left'},
+                            children = [
+                                dbc.Card(card_nb_formations_content,color="#edc6a2"),
+                                dbc.Card(card_nb_forma_commune_content,color="#edc6a2"),
+                                dbc.Card(card_pourcentage_selectif_content,color="#edc6a2"),
+                                
+                            ]
+                        ),
+                        ]
+                    ),
+                ]
+            ),
+    
+        
         html.Div(
             id="Map_Par_Formation",
             hidden=False,
@@ -113,7 +258,7 @@ def main_Dash():
 
                 html.Iframe(
                     id='mapParFormation',
-                    srcDoc=open("./templates/Carte_toute_formation.html", 'r').read(),
+                    srcDoc=open("../templates/Carte_toute_formation.html", 'r').read(),
                     width='100%',
                     height='650',
                 ),
@@ -149,7 +294,7 @@ def main_Dash():
                             id='Dropdown-bar_chart-holder',
                             hidden=False,
                             children=[
-                                html.H4(children='Sélection des formations souhaitées',),
+                                html.H4(children=f'Sélection des formations souhaitées',),
                                 dcc.Dropdown(
 
                                     options=FORMATIONS_options,
@@ -177,8 +322,8 @@ def main_Dash():
     )
     def choose_map_Formation(name):
         if name == "All":
-            return open("./templates/Carte_toute_formation.html", 'r').read()
-        return open("./templates/Carte_par_formation_{}.html".format(name), 'r').read()
+            return open("../templates/Carte_toute_formation.html", 'r').read()
+        return open("../templates/Carte_par_formation_{}.html".format(name), 'r').read()
 
     @app.callback(
         Output("Div_Graph", "hidden"), [Input("hideGraph", "n_clicks")],
@@ -215,7 +360,7 @@ def main_Dash():
                 fig = create_Histogram(data, "Capacité de l’établissement par formation")
                 return fig, True
             case 4:
-                fig = create_Pie_chart(data, "Effectif total des candidats pour une formation",
+                fig = create_Pie_chart(data, "Effectif total des candidats en phase principale",
                                        'Filière de formation très agrégée')
                 return fig, True
 
