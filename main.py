@@ -35,8 +35,7 @@ def main():
     pie_chart.render_chart(title="test")
 
     pie_chart = PieChart(data, values="Effectif total des candidats en phase principale",names='Filière de formation très agrégée')
-    pie_chart.render_chart()
-
+    pie_chart.render_chart(title="test")
     rank_chart = RankChart(data)
     rank_chart.render_chart()
     
@@ -65,7 +64,7 @@ def main():
     pourcentage_public = len(data.loc[(data['Statut de l’établissement de la filière de formation (public, privé…)'] == "Public")].index) / nombre_formation * 100
     print(pourcentage_public)
 
-    main_Dash()
+    # main_Dash()
 
 
 if __name__ == '__main__':
