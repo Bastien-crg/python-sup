@@ -20,26 +20,64 @@ from src.chart import Histogram
 from src.chart import ScatterChart
 from src.chart import EmptyChart
 
-from time import sleep
-
 def create_Bar_chart(DATA, column_Name, selected_formation=[]):
+    """Permet de créer un objet Bar_chart et de generer un graphique sous cette forme
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+        column_Name (str): nom de la collonne du ficher .csv que l'on veut étudier.
+        selected_formation (list, optional): Si une ou plusieurs formations sont mise dedans alors on ne créer le graphique que avec celles-ci . Defaults to [].
+
+    Returns:
+        fig: graphique ploty
+    """    
     bar_chart = BarChart(DATA, column=column_Name, selected_formations=selected_formation)  
     fig = bar_chart.render_chart()
     return fig
 
 def create_scatter_chart(DATA,abscisse,ordonee):
+    """Permet de créer un objet ScatterChart et de generer un graphique sous cette forme
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+        abscisse (str): nom de la collonne du ficher .csv que l'on veut étudier. Elle repésente l'axe des abscisses du graphique
+        ordonee (str): nom de la collonne du ficher .csv que l'on veut étudier. Elle repésente l'axe des ordonnees du graphique
+
+    Returns:
+        fig: graphique ploty
+    """
     scatter_chart = ScatterChart(DATA, abscisse=abscisse, ordonne=ordonee)
     fig = scatter_chart.render_chart()
     return fig
 
 
 def create_Histogram(DATA, x_name, nbins=20, max_value=199):
+    """Permet de créer un objet Histogram et de generer un graphique sous cette forme
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+        x_name (str): nom de la collonne du ficher .csv que l'on veut étudier. Elle repésente l'axe des x du graphique 
+        nbins (int, optional): Définis le nombre de bins. Defaults to 20.
+        max_value (int, optional): _description_. Defaults to 199.
+
+    Returns:
+        fig: graphique ploty
+    """
     histogram = Histogram(DATA, x=x_name, nbins=nbins, max_value=max_value)
     fig = histogram.render_chart()
     return fig
 
 
 def create_Pie_chart(DATA, values_name, names):
+    """Permet de créer un objet PieChart et de generer un graphique sous cette forme
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+        values_name (str): nom de la collonne du ficher .csv que l'on veut étudier. Elle repésente l'ensemble des données du graphique
+        names (str): nom de la collonne du ficher .csv contenant le nom des formation
+    Returns:
+        fig: graphique ploty
+    """
     pie_chart = PieChart(DATA, values=values_name,
                          names=names)
     fig = pie_chart.render_chart(title=values_name)
@@ -47,6 +85,14 @@ def create_Pie_chart(DATA, values_name, names):
 
 
 def create_Rank_chart(DATA):
+    """Permet de créer un objet RankChart et de generer un graphique sous cette forme
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+
+    Returns:
+        fig: graphique ploty
+    """
     if DATE != 2021:
         return create_Empty_chart()
     rank_chart = RankChart(DATA)
@@ -54,39 +100,71 @@ def create_Rank_chart(DATA):
     return fig
 
 def create_Empty_chart():
+    """Permet de créer un objet EmptyChart et de generer un graphique sous cette forme
+    Ce graphique est toujours vide et est utilisé lorsque un autre graphique manque de données
+
+    Returns:
+        fig: graphique ploty
+    """
     empty_chart = EmptyChart()
     fig = empty_chart.render_chart()
     return fig
 
 def choose_year_file(DATE):
+    """Fonctions permettant de choisir le fichier que l'on va étudier.
+
+    Args:
+        DATE (int): date du fichier que l'on souhaite étudier
+
+    Returns:
+        str : chemin pour acceder au fichier
+    """
     match DATE:
         case 2021:
-            return "DATA/fr-esr-parcoursup-2021.csv"
+            return "data/fr-esr-parcoursup-2021.csv"
         case 2020:
-            return "DATA/fr-esr-parcoursup-2020.csv"
+            return "data/fr-esr-parcoursup-2020.csv"
         case 2019:
-            return "DATA/fr-esr-parcoursup-2019.csv"
+            return "data/fr-esr-parcoursup-2019.csv"
         case 2018:
-            return "DATA/fr-esr-parcoursup-2018.csv"
+            return "data/fr-esr-parcoursup-2018.csv"
 
 
 def open_DATA(DATE):
-    file_name = choose_year_file(DATE)
-    file_manager = FileManager(file_name)
-    file_list = file_manager.open_file()
-    DATA = file_list[0]
+    """Fonction permet d'ouvrir le fichier contenant les données et de recuperer celle-ci
+
+    Args:
+        DATE (int): date du fichier que l'on souhaite étudier
+
+    Returns:
+        array pandas: liste pandas des données contenu dans le fichier .csv
+    """
+    file_name = choose_year_file(DATE) #Récupère l'emplacement du fichier
+    file_manager = FileManager(file_name) #Classe qui permet de gerer l'ouverture du fichier
+    file_list = file_manager.open_file() #Ouvre le fichier
+    DATA = file_list[0] #Récupere les données
     return DATA
 
 
 def init_maps(DATA):
+    """Permet d'initialiser toutes les cartes
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+    """
     coordTemp = DATA["Coordonnées GPS de la formation"]
     for i in range(len(coordTemp)):
         if (type(coordTemp[i]) != str):  # Certaines formations n'ont pas de coordonnées GPS
-            DATA = DATA.drop(labels=i, axis=0)
-    GestionCarte.createAllMap(DATA)
+            DATA = DATA.drop(labels=i, axis=0) #Alors on les retires
+    GestionCarte.createAllMap(DATA) # Créer toutes les cartes.
 
 
 def init_pie_chart(DATA):
+    """Initialise les diagrammes "Camenbert"
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+    """
     global pie_chart_choix
     global pie_chart_admis
 
@@ -97,6 +175,14 @@ def init_pie_chart(DATA):
                                        'Filière de formation très agrégée')
     
 def pie_chart_div(DATA):
+    """Créer la div du dash contenant les pie_chart
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+
+    Returns:
+        list: list contenant la partie du dash contenant les pie_chart
+    """
     init_pie_chart(DATA)
     div = [
         dcc.Tab(label="Repartitions des choix des élèves",
@@ -108,6 +194,14 @@ def pie_chart_div(DATA):
     return div
 
 def init_dash(DATE):
+    """initialise les données pour lancer le Dash
+
+    Args:
+        DATA : Contient toutes les données liées au formations disponible
+
+    Returns:
+        array pandas , fig ploty: données du fichier, premiere figure affiché.
+    """
     DATA = open_DATA(DATE)
     init_card(DATA,DATE)
     init_pie_chart(DATA)
@@ -251,7 +345,11 @@ def manage_dash(FORMATIONS_OPTIONS):
     app.layout = html.Div(
         children=[
             dcc.Location(id='url', refresh=False),
-            html.H1(children='python-sup',
+            html.H1(children=f'Python-Sup',
+                    style={'Position': 'relative', 'width': '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
+            html.H4(children=f'Par Yann LE BIHAN et Bastien CORGNAC',
+                    style={'Position': 'relative', 'width': '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
+            html.H5(children=f"DashBoard sur les données des formations parcoursupp",
                     style={'Position': 'relative', 'width': '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
             html.A(
                 id = "change_year",
@@ -395,6 +493,7 @@ def manage_dash(FORMATIONS_OPTIONS):
         ]
     )
 
+    #Permet de changer la carte
     @app.callback(
         Output("mapParFormation", "srcDoc"), [Input("Change", "value")],
     )
@@ -403,6 +502,7 @@ def manage_dash(FORMATIONS_OPTIONS):
             return open("templates/Carte_toute_formation.html", 'r').read()
         return open("templates/Carte_par_formation_{}.html".format(name), 'r').read()
 
+    #Cache les graphiques
     @app.callback(
         Output("Div_Graph", "hidden"), [Input("hideGraph", "n_clicks")],
     )
@@ -411,6 +511,7 @@ def manage_dash(FORMATIONS_OPTIONS):
             return False
         return True
 
+    #Ouvre le graphique dans une autre fenetre
     @app.callback(
         Output("PlayFig", "hidden"), [Input("showFig", "n_clicks")]
     )
@@ -420,12 +521,13 @@ def manage_dash(FORMATIONS_OPTIONS):
         n_clicks = 0
         return True
 
+    #Change le graphique
     @app.callback(
         Output(component_id='graph', component_property='figure'),  # (1)
         Output(component_id='Dropdown-bar_chart-holder', component_property='hidden'),
         [Input(component_id='graph-slider', component_property='value'), Input('Dropdown-bar_chart', 'value')]  # (2)
     )
-    def upDATE_figure(input_value, formation):
+    def update_figure(input_value, formation):
         global fig
         global DATA
         match input_value:
@@ -474,6 +576,7 @@ def manage_dash(FORMATIONS_OPTIONS):
         init_pie_chart(DATA)
         div_pie_chart = pie_chart_div(DATA)
         return html.Div(msg),div_card,[dcc.Tabs(id="tabs_pie_chart",children=div_pie_chart),]
+
 
     
     #

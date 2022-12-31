@@ -38,9 +38,24 @@ Afin de limiter le code pour générer des graphiques, nous avons créé une cla
 Elles sont contenues dans le dossier `./chart` et héritent toutes de la classe abstract BasicChart.
 Chaque classe à un constructeur et une fonction render_chart qui met en forme les données et renvoie un graphique plotly.
 #### 2.1.3. Gestion de cartes
-YANN
+Pour ne pas avoir de fortes lenteur lorsque l'on change de carte nous avons préférés les pré-générés.
+Les cartes sont indentiques pour chaques années.
+Pour les crées on a fait une fonction permettant de placer sur une carte de la france les emplacements de tous les batiments disposant d'une formation souhaité.
+Ainsi que une fonction appellant la première sur toutes les formations disponible.
+A noté que le fichier fournit n'est pas parfait, et que certaines formation ne dispose pas de coordonnées GSP, on ne les mets donc pas.
 #### 2.1.4. Dash
-YANN
+Pour la création du dash nous avons décidé de le separer en trois partie:
+Une collonne de gauche
+une collonne de droite
+et une ligne en dessous des deux collonnes.
+La colonne de gauche comprend deux parties différentes. La premiere consitue la partie haute et comprend des données importantes. A noter que certaines données ne sont pas disponibles en fonction des années. La partie basse comprends deux gaphique "camenbert", seul un apparait a la fois, il est possible de choisir le quel est visible en cliquant sur le l'onglet contenant le titre de graphique entre les données et le graphique.
+
+La partie de droite elle contient nos différentes cartes qui sont les emplacement des différentes formations disponible sur ParcourSupp. Il est possible de sélectionner une formation en particulière a l'aide de la file déroulante d'option se situant au dessus de la carte. Chaque formation a une couleur différentes et la taille des points est en fonctions de la capacité d'acceuil de l'etablissement où se situe la formation.
+
+La dernière partie elle contient les différents graphique. Il est possible de selectionner le type de graphique au l'on veux voir. Il est aussi possible de cliquer sur le bouton "Hide/Show Graph" qui fera disparaitre ou apparaitre tous les graph. Il y a aussi un bouton "Open Graph" permettant d'ouvrir le graphique dans un autre onglet. Pour un des graphique (bar_chart) il est aussi possible de choisir les formations que on désire voir, il est possible de faire une multi-sélection. Certaines graphiques ne seront pas disponible en fonction de l'année.
+
+A noter que au dessus de ces trois parties, entre le titre et celle-ci, il est possible de choisir l'année que l'on souhaite avoir.
+
 ### 2.2. Amélioration
 Notre dashboard est plutôt lent, une amélioration possible serait de mettre en place un système de cache qui permettrait de ne pas re-manipuler les données mais seulement afficher les graphiques.
 Cependant, au vu de la quantité de données, il faudrait faire attention à ce que ça ne surcharge pas trop la RAM.
