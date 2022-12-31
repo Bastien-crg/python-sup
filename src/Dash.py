@@ -72,7 +72,6 @@ def choose_year_file(date):
 
 def open_data(date):
     file_name = choose_year_file(date)
-    print(file_name)
     file_manager = FileManager(file_name)
     file_list = file_manager.open_file()
     data = file_list[0]
@@ -96,7 +95,17 @@ def init_pie_chart(data):
     pie_chart_admis = create_Pie_chart(data,
                                        "Effectif total des candidats ayant accepté la proposition de l’établissement (admis)",
                                        'Filière de formation très agrégée')
-
+    
+def pie_chart_div(data):
+    init_pie_chart(data)
+    div = [
+        dcc.Tab(label="Repartitions des choix des élèves",
+        children=[dcc.Graph(figure=pie_chart_choix)]),
+        dcc.Tab(
+            label="Effectif total des candidats ayant accepté la proposition de l’établissement",
+            children=[dcc.Graph(figure=pie_chart_admis)])
+    ]
+    return div
 
 def init_dash(date):
     data = open_data(date)
@@ -113,9 +122,7 @@ def init_card(data,date):
     global card_nb_forma_commune_content
     global card_pourcentage_selectif_content
     global card_pourcentage_public_content
-
     if date > 2020:
-        print("vamos")
         nb_commune = str(data['Commune de l’établissement'].nunique()) 
     else:
         nb_commune = "NON DISPONIBLE"
@@ -209,25 +216,37 @@ def init_card(data,date):
                                     ),
                             ]
     
-def manage_date(is_date_selected = False):
-    """Permet d'avoir la premiere année pour initialiser le Dash, on pourrat ensuite la changer en cliquant sur des voutonqs
 
-    Args:
-        is_date_selected (bool, optional): permet de savoir si l'utilisateur a choisie une date. Defaults to False.
-    """    
-    global date
-    if is_date_selected == False:
-        date = 2021
-    return date
+def card_div(data):
+    init_card(data,date)
+    div = [
+        html.Div(
+            id='left_cards_div',
+            style={'position': 'relative', 'width': '49%', 'float': 'left'},
+            children=[
+                        dbc.Card(card_nb_etablissement_content, color="#edc6a2"),
+                        dbc.Card(card_nb_ecole_inge_content, color="#edc6a2"),
+                        dbc.Card(card_pourcentage_public_content, color="#edc6a2"),
+                    ]
+            ),
 
+            html.Div(
+                    id="right_cards_div",
+                    style={'position': 'relative', 'width': '49%', 'float': 'left'},
+                    children=[
+                                dbc.Card(card_nb_formations_content, color="#edc6a2"),
+                                dbc.Card(card_nb_forma_commune_content, color="#edc6a2"),
+                                dbc.Card(card_pourcentage_selectif_content, color="#edc6a2"),
+                            ]
+                    ),
+    ]
+    return div
+    
 def manage_dash(FORMATIONS_OPTIONS):
     global fig
     global change_date
     global data
-    if change_date == True:
-        data , fig = init_dash(date)
-        change_date = False
-    print(date)
+    data , fig = init_dash(date)
     app = dash.Dash(__name__)
     app.layout = html.Div(
         children=[
@@ -282,13 +301,6 @@ def manage_dash(FORMATIONS_OPTIONS):
                                 children=[
                                     dcc.Tabs(
                                         id="tabs_pie_chart",
-                                        children=[
-                                            dcc.Tab(label="Repartitions des choix des élèves",
-                                                    children=[dcc.Graph(figure=pie_chart_choix)]),
-                                            dcc.Tab(
-                                                label="Effectif total des candidats ayant accepté la proposition de l’établissement",
-                                                children=[dcc.Graph(figure=pie_chart_admis)])
-                                        ]
                                     ),
                                 ]
                             )
@@ -415,6 +427,7 @@ def manage_dash(FORMATIONS_OPTIONS):
     )
     def update_figure(input_value, formation):
         global fig
+        global data
         match input_value:
             case 1:
                 fig = create_Bar_chart(data, "Filière de formation très agrégée", formation)
@@ -431,6 +444,8 @@ def manage_dash(FORMATIONS_OPTIONS):
 
     @app.callback(
     Output('container-button', 'children'),
+    Output('Cards_Div','children'),
+    Output('pie_chart','children'),
     Input('btn-2021', 'n_clicks'),
     Input('btn-2020', 'n_clicks'),
     Input('btn-2019', 'n_clicks'),
@@ -443,28 +458,22 @@ def manage_dash(FORMATIONS_OPTIONS):
         global change_date
         msg = "Année choisie = 2021"
         if "btn-2021" == ctx.triggered_id:
-            change_date = True
             date = 2021
             msg = "Année choisie = 2021"
         elif "btn-2020" == ctx.triggered_id:
-            change_date = True
             date = 2020
             msg = "Année choisie = 2020"
         elif "btn-2019" == ctx.triggered_id:
-            change_date = True
             date = 2019
             msg = "Année choisie = 2019"
-        elif "btn-2018" == ctx.triggered_id:
-            change_date = True
+        elif "btn-2018" == ctx.triggered_id: 
             date = 2018
             msg = "Année choisie = 2018"
-        print(date)
         data = open_data(date)
-        init_card(data,date)
+        div_card = card_div(data)
         init_pie_chart(data)
-        fig = create_Empty_chart()
-        print(data)
-        return html.Div(msg)
+        div_pie_chart = pie_chart_div(data)
+        return html.Div(msg),div_card,[dcc.Tabs(id="tabs_pie_chart",children=div_pie_chart),]
 
     
     #
@@ -498,7 +507,7 @@ def main_Dash(is_date_selected = False):
     global change_date
     change_date = False
     date = 2021
-    print(date)
     data , fig = init_dash(date)
+    
     manage_dash(FORMATIONS_OPTIONS)
     
