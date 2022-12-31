@@ -22,234 +22,239 @@ from src.chart import EmptyChart
 
 from time import sleep
 
-
-def create_Bar_chart(data, column_Name, selected_formation=[]):
-    bar_chart = BarChart(data, column=column_Name, selected_formations=selected_formation)
+def create_Bar_chart(DATA, column_Name, selected_formation=[]):
+    bar_chart = BarChart(DATA, column=column_Name, selected_formations=selected_formation)  
     fig = bar_chart.render_chart()
     return fig
 
-
-def create_scatter_chart(data, abscisse, ordonee):
-    scatter_chart = ScatterChart(data, abscisse=abscisse, ordonne=ordonee)
+def create_scatter_chart(DATA,abscisse,ordonee):
+    scatter_chart = ScatterChart(DATA, abscisse=abscisse, ordonne=ordonee)
     fig = scatter_chart.render_chart()
     return fig
 
 
-def create_Histogram(data, x_name, nbins=20, max_value=199):
-    histogram = Histogram(data, x=x_name, nbins=nbins, max_value=max_value)
+def create_Histogram(DATA, x_name, nbins=20, max_value=199):
+    histogram = Histogram(DATA, x=x_name, nbins=nbins, max_value=max_value)
     fig = histogram.render_chart()
     return fig
 
 
-def create_Pie_chart(data, values_name, names):
-    pie_chart = PieChart(data, values=values_name,
+def create_Pie_chart(DATA, values_name, names):
+    pie_chart = PieChart(DATA, values=values_name,
                          names=names)
     fig = pie_chart.render_chart(title=values_name)
     return fig
 
 
-def create_Rank_chart(data):
-    if date != 2021:
+def create_Rank_chart(DATA):
+    if DATE != 2021:
         return create_Empty_chart()
-    rank_chart = RankChart(data)
+    rank_chart = RankChart(DATA)
     fig = rank_chart.render_chart()
     return fig
-
 
 def create_Empty_chart():
     empty_chart = EmptyChart()
     fig = empty_chart.render_chart()
     return fig
 
-
-def choose_year_file(date):
-    match date:
+def choose_year_file(DATE):
+    match DATE:
         case 2021:
-            return "data/fr-esr-parcoursup-2021.csv"
+            return "DATA/fr-esr-parcoursup-2021.csv"
         case 2020:
-            return "data/fr-esr-parcoursup-2020.csv"
+            return "DATA/fr-esr-parcoursup-2020.csv"
         case 2019:
-            return "data/fr-esr-parcoursup-2019.csv"
+            return "DATA/fr-esr-parcoursup-2019.csv"
         case 2018:
-            return "data/fr-esr-parcoursup-2018.csv"
+            return "DATA/fr-esr-parcoursup-2018.csv"
 
 
-def open_data(date):
-    file_name = choose_year_file(date)
-    print(file_name)
+def open_DATA(DATE):
+    file_name = choose_year_file(DATE)
     file_manager = FileManager(file_name)
     file_list = file_manager.open_file()
-    data = file_list[0]
-    return data
+    DATA = file_list[0]
+    return DATA
 
 
-def init_maps(data):
-    coordTemp = data["Coordonnées GPS de la formation"]
+def init_maps(DATA):
+    coordTemp = DATA["Coordonnées GPS de la formation"]
     for i in range(len(coordTemp)):
         if (type(coordTemp[i]) != str):  # Certaines formations n'ont pas de coordonnées GPS
-            data = data.drop(labels=i, axis=0)
-    GestionCarte.createAllMap(data)
+            DATA = DATA.drop(labels=i, axis=0)
+    GestionCarte.createAllMap(DATA)
 
 
-def init_pie_chart(data):
+def init_pie_chart(DATA):
     global pie_chart_choix
     global pie_chart_admis
 
-    pie_chart_choix = create_Pie_chart(data, "Effectif total des candidats pour une formation",
+    pie_chart_choix = create_Pie_chart(DATA, "Effectif total des candidats pour une formation",
                                        'Filière de formation très agrégée')
-    pie_chart_admis = create_Pie_chart(data,
+    pie_chart_admis = create_Pie_chart(DATA,
                                        "Effectif total des candidats ayant accepté la proposition de l’établissement (admis)",
                                        'Filière de formation très agrégée')
+    
+def pie_chart_div(DATA):
+    init_pie_chart(DATA)
+    div = [
+        dcc.Tab(label="Repartitions des choix des élèves",
+        children=[dcc.Graph(figure=pie_chart_choix)]),
+        dcc.Tab(
+            label="Effectif total des candidats ayant accepté la proposition de l’établissement",
+            children=[dcc.Graph(figure=pie_chart_admis)])
+    ]
+    return div
 
-
-def init_dash(date):
-    data = open_data(date)
-    init_card(data, date)
-    init_pie_chart(data)
+def init_dash(DATE):
+    DATA = open_DATA(DATE)
+    init_card(DATA,DATE)
+    init_pie_chart(DATA)
     fig = create_Empty_chart()
-    return data, fig
+    return DATA, fig
 
 
-def init_card(data, date):
+def init_card(DATA,DATE):
     global card_nb_etablissement_content
     global card_nb_formations_content
     global card_nb_ecole_inge_content
     global card_nb_forma_commune_content
     global card_pourcentage_selectif_content
     global card_pourcentage_public_content
-
-    if date > 2020:
-        print("vamos")
-        nb_commune = str(data['Commune de l’établissement'].nunique())
+    if DATE > 2020:
+        nb_commune = str(DATA['Commune de l’établissement'].nunique()) 
     else:
         nb_commune = "NON DISPONIBLE"
 
-    if date > 2019:
-        selectivite = str(
-            len(data.loc[(data['Sélectivité'] == "formation sélective")].index) / len(data.index) * 100) + " %"
+    if DATE > 2019:
+        selectivite = str(len(DATA.loc[(DATA['Sélectivité'] == "formation sélective")].index) / len(DATA.index) * 100) + " %"
     else:
         selectivite = "NON DISPONIBLE"
-
-    if date > 2018:
-        prct_forma_public = str(len(data.loc[(data[
-                                                  'Statut de l’établissement de la filière de formation (public, privé…)'] == "Public")].index) / len(
-            data.index) * 100) + " %"
-    else:
+    
+    if DATE > 2018:
+        prct_forma_public = str(len(DATA.loc[(DATA['Statut de l’établissement de la filière de formation (public, privé…)'] == "Public")].index) / len(DATA.index) * 100) + " %"
+    else: 
         prct_forma_public = "NON DISPONIBLE"
+        
+    card_nb_etablissement_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre d'établissement", className="card_nb_etablissement",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        DATA['Établissement'].nunique(),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                    
+    card_nb_formations_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre de formations", className="card_nb_formations",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        len(DATA.index),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                
+    card_nb_ecole_inge_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre d'écoles d'ingénieur disponible", className="card_nb_ecole_inge",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        DATA.loc[(DATA['Filière de formation très agrégée'] == "Ecole d'Ingénieur")]["Établissement"].nunique(),
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                    ]
+                
+                
+    card_nb_forma_commune_content = [       
+                            dbc.CardBody(
+                                [
+                                    html.H4("Nombre de commune avec une formation", className="card_nb_forma_commune",style={'textAlign' : 'center'}),
+                                    html.H2(
+                                        nb_commune,
+                                        className="card-text",
+                                        style={'textAlign' : 'center'},
+                                    ),
+                                ]
+                            ),
+                        ]
+    
+    card_pourcentage_selectif_content = [       
+                                dbc.CardBody(
+                                        [
+                                            html.H4("Pourcentage des formations selectives ", className="card_pourcentage_selectif",style={'textAlign' : 'center'}),
+                                            html.H2(
+                                                selectivite,
+                                                className="card-text",
+                                                style={'textAlign' : 'center'},
+                                            ),
+                                        ]
+                                    ),
+                            ]
+                   
+    card_pourcentage_public_content = [       
+                                dbc.CardBody(
+                                         [
+                                            html.H4("Pourcentage des formations public ", className="card_pourcentage_public",style={'textAlign' : 'center'}),
+                                            html.H2(
+                                                prct_forma_public,
+                                                className="card-text",
+                                                style={'textAlign' : 'center'},
+                                            ),
+                                        ]
+                                    ),
+                            ]
+    
 
-    card_nb_etablissement_content = [
-        dbc.CardBody(
-            [
-                html.H4("Nombre d'établissement", className="card_nb_etablissement", style={'textAlign': 'center'}),
-                html.H2(
-                    data['Établissement'].nunique(),
-                    className="card-text",
-                    style={'textAlign': 'center'},
-                ),
-            ]
-        ),
+def card_div(DATA):
+    init_card(DATA,DATE)
+    div = [
+        html.Div(
+            id='left_cards_div',
+            style={'position': 'relative', 'width': '49%', 'float': 'left'},
+            children=[
+                        dbc.Card(card_nb_etablissement_content, color="#edc6a2"),
+                        dbc.Card(card_nb_ecole_inge_content, color="#edc6a2"),
+                        dbc.Card(card_pourcentage_public_content, color="#edc6a2"),
+                    ]
+            ),
+
+            html.Div(
+                    id="right_cards_div",
+                    style={'position': 'relative', 'width': '49%', 'float': 'left'},
+                    children=[
+                                dbc.Card(card_nb_formations_content, color="#edc6a2"),
+                                dbc.Card(card_nb_forma_commune_content, color="#edc6a2"),
+                                dbc.Card(card_pourcentage_selectif_content, color="#edc6a2"),
+                            ]
+                    ),
     ]
-
-    card_nb_formations_content = [
-        dbc.CardBody(
-            [
-                html.H4("Nombre de formations", className="card_nb_formations", style={'textAlign': 'center'}),
-                html.H2(
-                    len(data.index),
-                    className="card-text",
-                    style={'textAlign': 'center'},
-                ),
-            ]
-        ),
-    ]
-
-    card_nb_ecole_inge_content = [
-        dbc.CardBody(
-            [
-                html.H4("Nombre d'écoles d'ingénieur disponible", className="card_nb_ecole_inge",
-                        style={'textAlign': 'center'}),
-                html.H2(
-                    data.loc[(data['Filière de formation très agrégée'] == "Ecole d'Ingénieur")][
-                        "Établissement"].nunique(),
-                    className="card-text",
-                    style={'textAlign': 'center'},
-                ),
-            ]
-        ),
-    ]
-
-    card_nb_forma_commune_content = [
-        dbc.CardBody(
-            [
-                html.H4("Nombre de commune avec une formation", className="card_nb_forma_commune",
-                        style={'textAlign': 'center'}),
-                html.H2(
-                    nb_commune,
-                    className="card-text",
-                    style={'textAlign': 'center'},
-                ),
-            ]
-        ),
-    ]
-
-    card_pourcentage_selectif_content = [
-        dbc.CardBody(
-            [
-                html.H4("Pourcentage des formations selectives ", className="card_pourcentage_selectif",
-                        style={'textAlign': 'center'}),
-                html.H2(
-                    selectivite,
-                    className="card-text",
-                    style={'textAlign': 'center'},
-                ),
-            ]
-        ),
-    ]
-
-    card_pourcentage_public_content = [
-        dbc.CardBody(
-            [
-                html.H4("Pourcentage des formations public ", className="card_pourcentage_public",
-                        style={'textAlign': 'center'}),
-                html.H2(
-                    prct_forma_public,
-                    className="card-text",
-                    style={'textAlign': 'center'},
-                ),
-            ]
-        ),
-    ]
-
-
-def manage_date(is_date_selected=False):
-    """Permet d'avoir la premiere année pour initialiser le Dash, on pourrat ensuite la changer en cliquant sur des voutonqs
-
-    Args:
-        is_date_selected (bool, optional): permet de savoir si l'utilisateur a choisie une date. Defaults to False.
-    """
-    global date
-    if is_date_selected == False:
-        date = 2021
-    return date
-
-
+    return div
+    
 def manage_dash(FORMATIONS_OPTIONS):
     global fig
-    global change_date
-    global data
-    if change_date == True:
-        data, fig = init_dash(date)
-        change_date = False
-    print(date)
-
+    global change_DATE
+    global DATA
+    DATA , fig = init_dash(DATE)
     app = dash.Dash(__name__)
     app.layout = html.Div(
         children=[
             dcc.Location(id='url', refresh=False),
-            html.H1(children=f'Titre de la page',
+            html.H1(children='python-sup',
                     style={'Position': 'relative', 'width': '100%', 'textAlign': 'center', 'color': '#7FDBFF'}),
             html.A(
-                id="change_year",
+                id = "change_year",
                 children=[
                     html.Button('2021', id='btn-2021', n_clicks=0),
                     html.Button('2020', id='btn-2020', n_clicks=0),
@@ -258,8 +263,8 @@ def manage_dash(FORMATIONS_OPTIONS):
                     html.Div(id='container-button')
                 ]),
             html.Div(
-                id="main_body",
-                children=[
+                id = "main_body",
+                children = [
                     html.Div(
                         id="Left_column",
                         style={'position': 'relative', 'width': '48%', 'float': 'left'},
@@ -296,13 +301,6 @@ def manage_dash(FORMATIONS_OPTIONS):
                                 children=[
                                     dcc.Tabs(
                                         id="tabs_pie_chart",
-                                        children=[
-                                            dcc.Tab(label="Repartitions des choix des élèves",
-                                                    children=[dcc.Graph(figure=pie_chart_choix)]),
-                                            dcc.Tab(
-                                                label="Effectif total des candidats ayant accepté la proposition de l’établissement",
-                                                children=[dcc.Graph(figure=pie_chart_admis)])
-                                        ]
                                     ),
                                 ]
                             )
@@ -427,68 +425,64 @@ def manage_dash(FORMATIONS_OPTIONS):
         Output(component_id='Dropdown-bar_chart-holder', component_property='hidden'),
         [Input(component_id='graph-slider', component_property='value'), Input('Dropdown-bar_chart', 'value')]  # (2)
     )
-    def update_figure(input_value, formation):
+    def upDATE_figure(input_value, formation):
         global fig
+        global DATA
         match input_value:
             case 1:
-                fig = create_Bar_chart(data, "Filière de formation très agrégée", formation)
+                fig = create_Bar_chart(DATA, "Filière de formation très agrégée", formation)
                 return fig, False
             case 2:
-                fig = create_Rank_chart(data)
+                fig = create_Rank_chart(DATA)
                 return fig, True
             case 3:
-                fig = create_Histogram(data, "Capacité de l’établissement par formation")
+                fig = create_Histogram(DATA, "Capacité de l’établissement par formation")
                 return fig, True
             case 4:
-                fig = create_scatter_chart(data, "Capacité de l’établissement",
-                                           'Nombre de formations par établissement')
+                fig = create_scatter_chart(DATA, "Capacité de l’établissement",'Nombre de formations par établissement')
                 return fig, True
 
     @app.callback(
-        Output('container-button', 'children'),
-        Input('btn-2021', 'n_clicks'),
-        Input('btn-2020', 'n_clicks'),
-        Input('btn-2019', 'n_clicks'),
-        Input('btn-2018', 'n_clicks')
-    )
+    Output('container-button', 'children'),
+    Output('Cards_Div','children'),
+    Output('pie_chart','children'),
+    Input('btn-2021', 'n_clicks'),
+    Input('btn-2020', 'n_clicks'),
+    Input('btn-2019', 'n_clicks'),
+    Input('btn-2018', 'n_clicks')
+)
     def displayClick(btn1, btn2, btn3, btn4):
-        global date
+        global DATE
         global fig
-        global data
-        global change_date
+        global DATA
+        global change_DATE
         msg = "Année choisie = 2021"
         if "btn-2021" == ctx.triggered_id:
-            change_date = True
-            date = 2021
+            DATE = 2021
             msg = "Année choisie = 2021"
         elif "btn-2020" == ctx.triggered_id:
-            change_date = True
-            date = 2020
+            DATE = 2020
             msg = "Année choisie = 2020"
         elif "btn-2019" == ctx.triggered_id:
-            change_date = True
-            date = 2019
+            DATE = 2019
             msg = "Année choisie = 2019"
-        elif "btn-2018" == ctx.triggered_id:
-            change_date = True
-            date = 2018
+        elif "btn-2018" == ctx.triggered_id: 
+            DATE = 2018
             msg = "Année choisie = 2018"
-        print(date)
-        data = open_data(date)
-        init_card(data, date)
-        init_pie_chart(data)
-        fig = create_Empty_chart()
-        print(data)
-        return html.Div(msg)
+        DATA = open_DATA(DATE)
+        div_card = card_div(DATA)
+        init_pie_chart(DATA)
+        div_pie_chart = pie_chart_div(DATA)
+        return html.Div(msg),div_card,[dcc.Tabs(id="tabs_pie_chart",children=div_pie_chart),]
 
+    
     #
     # RUN APP
     #
 
     app.run_server(debug=True)
 
-
-def main_Dash(is_date_selected=False):
+def main_Dash(is_DATE_selected = False):
     # Dictionnaire des formations possibles
     FORMATIONS = dict(
         BTS="BTS",
@@ -507,12 +501,13 @@ def main_Dash(is_date_selected=False):
         {"label": str(FORMATIONS[formations]), "value": str(FORMATIONS[formations])}
         for formations in FORMATIONS
     ]
-    global date
+    global DATE
     global fig
-    global data
-    global change_date
-    change_date = False
-    date = 2021
-    print(date)
-    data, fig = init_dash(date)
+    global DATA
+    global change_DATE
+    change_DATE = False
+    DATE = 2021
+    DATA , fig = init_dash(DATE)
+    
     manage_dash(FORMATIONS_OPTIONS)
+    
